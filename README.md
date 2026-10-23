@@ -1,25 +1,48 @@
 # Reddit 广告全流程 Agent Skills
 
-本仓库存放面向 Reddit 广告投放全流程的 AI Agent Skills（智能体技能）。整套工作流由五个前后衔接的技能组成，覆盖从前期社区真实需求调研、具体广告方案制定、平台投放执行、跨平台转化归因，到投放结束后的素材包与数据看板归档。
+本仓库存放面向 Reddit 广告投放全流程的 AI Agent Skills（智能体技能）。整套工作流由五个前后衔接的技能组成，覆盖社区真实需求调研、具体广告方案制定、平台投放执行、跨平台转化归因，以及投放结束后的素材包与数据看板归档。
 
 ## 五阶段整体工作流
 
 ```mermaid
-flowchart TD
-    S1["1. 社区需求调研<br/>reddit-community-research<br/>（已收录）"] --> S2["2. 具体广告方案制定<br/>ad-campaign-plan<br/>（规划中）"]
-    S2 --> S3["3. 从方案到 Reddit 投放<br/>reddit-ad-launch<br/>（规划中）"]
-    S3 --> S4["4. 广告归因与转化追踪<br/>ads-attribution<br/>（规划中）"]
-    S4 --> S5["5. 投放后资料与数据归档<br/>ad-campaign-archive<br/>（已收录）"]
-    S5 -.->|"沉淀可复用导入包与转化数据<br/>指导下一轮调研与测试"| S1
+flowchart LR
+    subgraph P1["前期调研与策划"]
+        direction LR
+        S1(["1. 社区需求调研 · reddit-community-research"])
+        S2(["2. 具体广告方案制定 · 规划中"])
+        S1 --> S2
+    end
+
+    subgraph P2["投放执行与追踪"]
+        direction LR
+        S3(["3. Reddit 投放执行 · 规划中"])
+        S4(["4. 广告归因与转化追踪 · 规划中"])
+        S3 --> S4
+    end
+
+    subgraph P3["资产沉淀与复盘"]
+        direction LR
+        S5(["5. 投放后资料与数据归档 · ad-campaign-archive"])
+    end
+
+    S2 --> S3
+    S4 --> S5
+    S5 -.->|"沉淀复投包与真实转化数据"| S1
+    S5 -.->|"指导下一批测试方案"| S2
+
+    classDef ready fill:#DCFCE7,stroke:#16A34A,stroke-width:2px,color:#14532D
+    classDef planned fill:#F8FAFC,stroke:#64748B,stroke-width:1.5px,stroke-dasharray: 5 5,color:#334155
+    class S1,S5 ready
+    class S2,S3,S4 planned
 ```
 
-| 阶段 | 技能名称 | 当前状态 | 核心职责 | 主要产出 |
-| --- | --- | --- | --- | --- |
-| 第一阶段 | [`reddit-community-research`](skills/reddit-community-research/SKILL.md) | 已收录 | 采集并精读 Reddit 社区真实帖子与评论，提取带发生条件的具体需求，构建机会空间树（Outcome Space 期望结果空间 $\rightarrow$ 机会空间 $\rightarrow$ 解决方案 $\rightarrow$ 广告方向） | SQLite 原始资料库、逐帖需求记录、Notion 调研报告、FigJam 机会空间白板 |
-| 第二阶段 | 调研后的具体广告方案技能 | 规划中 | 基于第一阶段筛出的重点机会空间、买方视角竞争定位与广告方向，制定具体的广告测试假设、受众定向、文案脚本与视觉画面方案 | 结构化广告方案文档、分受众文案与视觉制作清单、实验对照设计 |
-| 第三阶段 | 从方案到 Reddit 投放技能 | 规划中 | 将确认后的广告方案转化为 Reddit Ads（Reddit 广告后台）标准配置，完成广告系列（Campaign）、广告组（Ad Group）、创意素材与带 UTM（来源追踪参数）落地链接的批量生成与上线检查 | 平台标准批量导入表、上线前参数与预算核对清单 |
-| 第四阶段 | 广告归因与转化追踪技能 | 规划中 | 核对广告平台曝光点击数据与站内分析工具（如 PostHog 产品分析平台）的访客身份、UTM 参数传递、观察窗口及注册激活漏斗，统一跨平台转化统计口径 | 归因审计报告、首次广告到站归属规则、注册与核心行为转化漏斗 |
-| 第五阶段 | [`ad-campaign-archive`](skills/ad-campaign-archive/SKILL.md) | 已收录 | 在单批广告投放完成后，整理最终投放素材、可复用 ZIP 导入包、带日期的落地页完整截图、逐广告与逐访客 Excel 数据表以及 PostHog 看板，统一汇总到 Notion 正式入口 | 可直接复用的广告导入 ZIP 包、落地页存档、多工作表 Excel 数据文件、PostHog 看板、Notion 汇总页 |
+| 阶段 | 技能 | 状态 | 主要产出 |
+| --- | --- | --- | --- |
+| 第一阶段 | [`reddit-community-research`](skills/reddit-community-research/SKILL.md) | 已收录 | SQLite 原始资料库、逐帖需求记录、Notion 调研报告、FigJam 机会空间白板 |
+| 第二阶段 | 调研后的具体广告方案技能 | 规划中 | 结构化广告方案文档、分受众文案与视觉制作清单、实验对照设计 |
+| 第三阶段 | 从方案到 Reddit 投放技能 | 规划中 | 平台标准批量导入表、带 UTM（来源追踪参数）落地链接、上线核对清单 |
+| 第四阶段 | 广告归因与转化追踪技能 | 规划中 | 归因审计报告、首次广告到站归属规则、注册与核心行为转化漏斗 |
+| 第五阶段 | [`ad-campaign-archive`](skills/ad-campaign-archive/SKILL.md) | 已收录 | 可复用广告导入 ZIP 包、落地页截图存档、多工作表 Excel、PostHog 看板、Notion 汇总页 |
 
 ---
 
@@ -27,9 +50,49 @@ flowchart TD
 
 ### 1. 社区需求调研与机会空间构建（`reddit-community-research`，已收录）
 
-放在整个广告流程的第一步，用于解决“向谁投、讲什么痛点、给什么承诺”的问题。
+**核心职责**：放在整个广告流程的第一步，采集并精读 Reddit 社区的真实帖子与评论，提取带发生条件的具体需求，构建机会空间树（Outcome Space 期望结果空间 $\rightarrow$ 机会空间 $\rightarrow$ 解决方案 $\rightarrow$ 广告方向），解决“向谁投、讲什么痛点、给什么产品承诺”的问题。
 
-#### 核心工作内容
+#### 执行流程图
+
+```mermaid
+flowchart TD
+    subgraph A["第一部分：准备与资料采集"]
+        A1(["步骤 1：明确研究目标与我方产品真实能力边界"])
+        A2(["步骤 2：通过脚本采集或导入 Reddit 讨论至 SQLite 数据库"])
+        A1 --> A2
+    end
+
+    subgraph B["第二部分：社区并行精读与机会空间树构建"]
+        B1(["步骤 3：按社区并行初筛与逐帖精读，提取大白话需求与问题归属"])
+        B2(["步骤 4a：合并同一业务环节的具体障碍，形成中间层机会空间"])
+        B3(["步骤 4b：向上归纳期望结果空间 Outcome Space"])
+        B4(["步骤 4c：向下结合买方视角竞争定位，按独立购买理由拆分解决方案与广告方向"])
+        B5(["步骤 4d：人工逐项核对代表帖原话、事实与猜测边界及去重统计数字"])
+        B1 --> B2
+        B2 --> B3
+        B2 --> B4
+        B3 --> B5
+        B4 --> B5
+    end
+
+    subgraph C["第三部分：专题深化与双端交付"]
+        C1(["步骤 5：按未回答的研究问题选用画像、旅程、平台评价或 Kano 专题"])
+        C2(["步骤 6：同步交付 Notion 调研报告与 FigJam 四层色卡机会空间白板"])
+        C1 --> C2
+    end
+
+    A2 --> B1
+    B5 --> C1
+
+    classDef phaseA fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#1E3A8A
+    classDef phaseB fill:#FEF3C7,stroke:#D97706,stroke-width:1.5px,color:#78350F
+    classDef phaseC fill:#DCFCE7,stroke:#16A34A,stroke-width:1.5px,color:#14532D
+    class A1,A2 phaseA
+    class B1,B2,B3,B4,B5 phaseB
+    class C1,C2 phaseC
+```
+
+#### 六个步骤说明
 
 1. **确认研究目标与产品边界**：明确要研究的产品、目标人群和需要回答的问题；提前核清我方产品已经具备的真实能力，保证后续推导出的广告承诺都能兑现。
 2. **采集与管理原始社区讨论**：通过配套脚本从 Arctic Shift（Reddit 历史公共归档接口）或已有导出文件采集指定时间范围的帖子和评论，保存在本地 SQLite 数据库中，保留回复层级并按编号去重。
@@ -87,39 +150,96 @@ python3 skills/reddit-community-research/scripts/reddit_research.py count \
 
 ### 2. 调研后的具体广告方案技能（规划中）
 
-承接第一阶段产出的机会空间树与广告方向卡片，将高优先级的机会转化为可直接生产的广告方案：
+**核心职责**：承接第一阶段产出的机会空间树与广告方向卡片，将高优先级的机会转化为可直接投入生产的广告方案。
 
-- 挑选证据最充足、转化潜力最高的机会空间分支，明确本轮测试的受众社区与人群定向。
-- 为每个独立购买理由编写完整的广告标题（Headline）、正文钩子（Body Copy）、行动号召（CTA）以及对应的视觉画面脚本。
-- 设计配套落地页的承接首屏文案与转化路径，保证用户点击广告后的页面信息与广告承诺一致。
+```mermaid
+flowchart LR
+    P2_1(["步骤 1：筛选重点机会空间与目标社区受众"]) --> P2_2(["步骤 2：按独立购买理由编写标题、钩子与画面脚本"]) --> P2_3(["步骤 3：设计落地页首屏承接与实验对照方案"])
+
+    classDef planStep fill:#F8FAFC,stroke:#64748B,stroke-width:1.5px,stroke-dasharray: 5 5,color:#334155
+    class P2_1,P2_2,P2_3 planStep
+```
+
+- **筛选机会与受众**：挑选证据最充足、转化潜力最高的机会空间分支，明确本轮测试的受众社区与人群定向。
+- **编写文案与画面脚本**：为每个独立购买理由编写完整的广告标题（Headline）、正文钩子（Body Copy）、行动号召（CTA）以及对应的视觉画面脚本。
+- **设计落地页承接**：设计配套落地页的首屏文案与转化路径，保证用户点击广告后的页面信息与广告承诺一致。
 
 ---
 
 ### 3. 从方案到 Reddit 投放技能（规划中）
 
-承接第二阶段确认的广告方案与制作好的视觉素材，完成上线前的平台配置：
+**核心职责**：承接第二阶段确认的广告方案与制作好的视觉素材，完成 Reddit Ads（Reddit 广告后台）上线前的批量配置与检查。
 
-- 生成符合 Reddit Ads 后台当前导入模板规范的广告系列、广告组和广告创意配置表。
-- 为每条广告配置独立的 UTM 来源追踪参数（`utm_source`、`utm_medium`、`utm_campaign`、`utm_content` 等），支持后续按单条广告追踪效果。
-- 核对预算上限、出价策略、投放时段、目标社区与素材文件规格，生成可直接上传后台的投放包。
+```mermaid
+flowchart LR
+    P3_1(["步骤 1：生成广告系列、广告组与创意批量配置表"]) --> P3_2(["步骤 2：为每条广告配置独立的 UTM 来源追踪参数"]) --> P3_3(["步骤 3：核对预算、出价策略、目标社区与素材规格"])
+
+    classDef planStep fill:#F8FAFC,stroke:#64748B,stroke-width:1.5px,stroke-dasharray: 5 5,color:#334155
+    class P3_1,P3_2,P3_3 planStep
+```
+
+- **生成批量配置表**：生成符合当前账户导入模板规范的广告系列（Campaign）、广告组（Ad Group）和广告创意配置表。
+- **配置追踪参数**：为每条广告配置独立的 UTM 来源追踪参数（`utm_source`、`utm_medium`、`utm_campaign`、`utm_content` 等），支持后续按单条广告追踪效果。
+- **上线前核对**：核对预算上限、出价策略、投放时段、目标社区与素材文件规格，生成可直接上传后台的投放包。
 
 ---
 
 ### 4. 广告归因与转化追踪技能（规划中）
 
-在广告投放期间与结算阶段，打通广告平台数据与站内产品行为数据：
+**核心职责**：在广告投放期间与结算阶段，打通 Reddit 广告平台曝光点击数据与站内产品分析工具（如 PostHog）的访客转化数据，统一跨平台统计口径。
 
-- 对照 Reddit 广告后台的曝光、点击、花费数据与站内分析工具（PostHog 等）采集到的访问事件。
-- 核对首次广告到站归属规则、观察窗口天数以及匿名访客到注册用户的身份合并逻辑。
-- 排查链接参数丢失、重复计数或跨平台统计口径不一致的问题，输出准确的转化漏斗数据。
+```mermaid
+flowchart LR
+    P4_1(["步骤 1：对照广告后台曝光点击与站内实际访问事件"]) --> P4_2(["步骤 2：核对首次广告到站归属规则、观察窗口与身份合并"]) --> P4_3(["步骤 3：排查参数丢失并输出注册与激活转化漏斗"])
+
+    classDef planStep fill:#F8FAFC,stroke:#64748B,stroke-width:1.5px,stroke-dasharray: 5 5,color:#334155
+    class P4_1,P4_2,P4_3 planStep
+```
+
+- **跨平台数据对照**：对照 Reddit 广告后台的曝光、点击、花费数据与站内采集到的实际访问事件。
+- **核对归属与身份合并**：核对首次广告到站归属规则、观察窗口天数以及匿名访客到注册用户的身份合并逻辑。
+- **输出转化漏斗**：排查链接参数丢失、重复计数或跨平台统计口径不一致的问题，输出准确的注册与激活漏斗。
 
 ---
 
 ### 5. 投放后资料与数据归档（`ad-campaign-archive`，已收录）
 
-放在单批广告投放完成之后，负责把散落在广告后台、本地目录、聊天会话和分析看板里的资料整理成一套标准档案，方便团队复盘并在下一批投放时直接复用。
+**核心职责**：在单批广告投放完成之后，把散落在广告后台、本地目录、聊天会话和 PostHog 分析看板里的资料整理成一套标准档案，统一汇总到 Notion 正式入口，方便团队复盘并在下一批投放时直接复用。
 
-#### 核心工作内容
+#### 执行流程图
+
+```mermaid
+flowchart TD
+    subgraph A["第一部分：广告核对与素材归档"]
+        S1(["步骤 1：核对广告平台真实投放记录，确认最终上线素材与参数"])
+        S2(["步骤 2：用脚本检查 CSV 引用素材并平铺打包为可复用 ZIP 导入包"])
+        S3(["步骤 3：保存单广告素材对照表与标注抓取日期的落地页完整长截图"])
+        S1 --> S2
+        S2 --> S3
+    end
+
+    subgraph B["第二部分：跨平台数据与看板整理"]
+        S4(["步骤 4：合并平台花费与站内转化数据，生成逐广告与逐访客多工作表 Excel"])
+        S5(["步骤 5：更新 PostHog 主看板与分广告转化漏斗，验证筛选器与统计口径"])
+        S4 --> S5
+    end
+
+    subgraph C["第三部分：正式入口汇总"]
+        S6(["步骤 6：汇总复投包、Excel 表、素材截图、看板与会话链接至 Notion 正式入口"])
+    end
+
+    S3 --> S4
+    S5 --> S6
+
+    classDef stepA fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#1E3A8A
+    classDef stepB fill:#FEF3C7,stroke:#D97706,stroke-width:1.5px,color:#78350F
+    classDef stepC fill:#DCFCE7,stroke:#16A34A,stroke-width:1.5px,color:#14532D
+    class S1,S2,S3 stepA
+    class S4,S5 stepB
+    class S6 stepC
+```
+
+#### 六个步骤说明
 
 1. **确认本批广告与最终素材**：以广告平台实际投放记录为准，核对每条广告的广告系列、广告组、广告编号、标题、主图、缩略图和带 UTM 参数的落地链接，区分最终上线版本与过程草稿。
 2. **制作可复用的 Reddit 导入包**：导出或生成符合当前账户模板的 CSV 文件（复投模板默认设为 `PAUSED` 暂停状态，保留受众与关键词配置），将 CSV 与实际引用的主图、缩略图平铺打包为单个 ZIP 文件。
@@ -146,11 +266,11 @@ python3 skills/ad-campaign-archive/scripts/package_assets.py \
 | 路径 | 说明 |
 | --- | --- |
 | [`skills/reddit-community-research/SKILL.md`](skills/reddit-community-research/SKILL.md) | 第一阶段：Reddit 社区需求调研与机会空间构建技能主指令 |
-| [`skills/reddit-community-research/references/`](skills/reddit-community-research/references) | 调研技能的采集工具说明、需求提取规则、机会空间树分类规则、定位与广告卡片写法、选做专题与双端交付规范 |
+| [`skills/reddit-community-research/references/`](skills/reddit-community-research/references) | 采集工具说明、需求提取规则、机会空间树分类规则、定位与广告卡片写法、选做专题与双端交付规范 |
 | [`skills/reddit-community-research/scripts/reddit_research.py`](skills/reddit-community-research/scripts/reddit_research.py) | Reddit 历史数据采集、SQLite 存储、初筛分批、讨论树读取与去重统计脚本 |
 | [`skills/reddit-community-research/tests/`](skills/reddit-community-research/tests) | `reddit_research.py` 的单元测试与测试样例数据 |
 | [`skills/ad-campaign-archive/SKILL.md`](skills/ad-campaign-archive/SKILL.md) | 第五阶段：广告投放后资料与数据归档技能主指令 |
-| [`skills/ad-campaign-archive/references/`](skills/ad-campaign-archive/references) | 归档技能的交付物清单、Reddit 导入包规范、Excel 与 PostHog 看板口径说明及会话总结依据 |
+| [`skills/ad-campaign-archive/references/`](skills/ad-campaign-archive/references) | 归档交付物清单、Reddit 导入包规范、Excel 与 PostHog 看板口径说明及会话总结依据 |
 | [`skills/ad-campaign-archive/scripts/package_assets.py`](skills/ad-campaign-archive/scripts/package_assets.py) | 广告导入 CSV 与图片素材核对及 ZIP 平铺打包脚本 |
 
 ---
