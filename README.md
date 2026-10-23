@@ -5,30 +5,18 @@
 ## 五阶段整体工作流
 
 ```mermaid
-flowchart LR
-    subgraph P1["前期调研与策划"]
-        direction LR
-        S1(["1. 社区需求调研 · reddit-community-research"])
-        S2(["2. 具体广告方案制定 · 规划中"])
-        S1 --> S2
-    end
+flowchart TD
+    S1["1. 社区需求调研 · reddit-community-research（已收录）"]
+    S2["2. 具体广告方案制定（规划中）"]
+    S3["3. 从方案到 Reddit 投放（规划中）"]
+    S4["4. 广告归因与转化追踪（规划中）"]
+    S5["5. 投放后资料与数据归档 · ad-campaign-archive（已收录）"]
 
-    subgraph P2["投放执行与追踪"]
-        direction LR
-        S3(["3. Reddit 投放执行 · 规划中"])
-        S4(["4. 广告归因与转化追踪 · 规划中"])
-        S3 --> S4
-    end
-
-    subgraph P3["资产沉淀与复盘"]
-        direction LR
-        S5(["5. 投放后资料与数据归档 · ad-campaign-archive"])
-    end
-
+    S1 --> S2
     S2 --> S3
+    S3 --> S4
     S4 --> S5
-    S5 -.->|"沉淀复投包与真实转化数据"| S1
-    S5 -.->|"指导下一批测试方案"| S2
+    S5 -.->|"复投包与转化数据反哺下一轮"| S1
 
     classDef ready fill:#DCFCE7,stroke:#16A34A,stroke-width:2px,color:#14532D
     classDef planned fill:#F8FAFC,stroke:#64748B,stroke-width:1.5px,stroke-dasharray: 5 5,color:#334155
@@ -56,33 +44,15 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    subgraph A["第一部分：准备与资料采集"]
-        A1(["步骤 1：明确研究目标与我方产品真实能力边界"])
-        A2(["步骤 2：通过脚本采集或导入 Reddit 讨论至 SQLite 数据库"])
-        A1 --> A2
-    end
-
-    subgraph B["第二部分：社区并行精读与机会空间树构建"]
-        B1(["步骤 3：按社区并行初筛与逐帖精读，提取大白话需求与问题归属"])
-        B2(["步骤 4a：合并同一业务环节的具体障碍，形成中间层机会空间"])
-        B3(["步骤 4b：向上归纳期望结果空间 Outcome Space"])
-        B4(["步骤 4c：向下结合买方视角竞争定位，按独立购买理由拆分解决方案与广告方向"])
-        B5(["步骤 4d：人工逐项核对代表帖原话、事实与猜测边界及去重统计数字"])
-        B1 --> B2
-        B2 --> B3
-        B2 --> B4
-        B3 --> B5
-        B4 --> B5
-    end
-
-    subgraph C["第三部分：专题深化与双端交付"]
-        C1(["步骤 5：按未回答的研究问题选用画像、旅程、平台评价或 Kano 专题"])
-        C2(["步骤 6：同步交付 Notion 调研报告与 FigJam 四层色卡机会空间白板"])
-        C1 --> C2
-    end
-
-    A2 --> B1
-    B5 --> C1
+    A1["1. 明确目标与产品边界"] --> A2["2. 采集讨论存入数据库"]
+    A2 --> B1["3. 社区并行初筛与精读"]
+    B1 --> B2["4a. 提炼中间层机会空间"]
+    B2 --> B3["4b. 向上归纳期望结果"]
+    B2 --> B4["4c. 向下拆分方案与广告"]
+    B3 --> B5["4d. 人工核对代表帖与统计"]
+    B4 --> B5
+    B5 --> C1["5. 按需选做研究专题"]
+    C1 --> C2["6. Notion 与 FigJam 双端交付"]
 
     classDef phaseA fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#1E3A8A
     classDef phaseB fill:#FEF3C7,stroke:#D97706,stroke-width:1.5px,color:#78350F
@@ -154,7 +124,7 @@ python3 skills/reddit-community-research/scripts/reddit_research.py count \
 
 ```mermaid
 flowchart LR
-    P2_1(["步骤 1：筛选重点机会空间与目标社区受众"]) --> P2_2(["步骤 2：按独立购买理由编写标题、钩子与画面脚本"]) --> P2_3(["步骤 3：设计落地页首屏承接与实验对照方案"])
+    P2_1["1. 筛选机会与受众"] --> P2_2["2. 编写文案与画面脚本"] --> P2_3["3. 设计落地页承接"]
 
     classDef planStep fill:#F8FAFC,stroke:#64748B,stroke-width:1.5px,stroke-dasharray: 5 5,color:#334155
     class P2_1,P2_2,P2_3 planStep
@@ -172,7 +142,7 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    P3_1(["步骤 1：生成广告系列、广告组与创意批量配置表"]) --> P3_2(["步骤 2：为每条广告配置独立的 UTM 来源追踪参数"]) --> P3_3(["步骤 3：核对预算、出价策略、目标社区与素材规格"])
+    P3_1["1. 生成批量配置表"] --> P3_2["2. 配置 UTM 追踪参数"] --> P3_3["3. 核对预算与素材规格"]
 
     classDef planStep fill:#F8FAFC,stroke:#64748B,stroke-width:1.5px,stroke-dasharray: 5 5,color:#334155
     class P3_1,P3_2,P3_3 planStep
@@ -180,7 +150,7 @@ flowchart LR
 
 - **生成批量配置表**：生成符合当前账户导入模板规范的广告系列（Campaign）、广告组（Ad Group）和广告创意配置表。
 - **配置追踪参数**：为每条广告配置独立的 UTM 来源追踪参数（`utm_source`、`utm_medium`、`utm_campaign`、`utm_content` 等），支持后续按单条广告追踪效果。
-- **上线前核对**：核对预算上限、出价策略、投放时段、目标社区与素材文件规格，生成可直接上传后台的投放包。
+- **核对预算与素材规格**：核对预算上限、出价策略、投放时段、目标社区与素材文件规格，生成可直接上传后台的投放包。
 
 ---
 
@@ -190,7 +160,7 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    P4_1(["步骤 1：对照广告后台曝光点击与站内实际访问事件"]) --> P4_2(["步骤 2：核对首次广告到站归属规则、观察窗口与身份合并"]) --> P4_3(["步骤 3：排查参数丢失并输出注册与激活转化漏斗"])
+    P4_1["1. 跨平台数据对照"] --> P4_2["2. 核对归属与身份合并"] --> P4_3["3. 输出注册与激活漏斗"]
 
     classDef planStep fill:#F8FAFC,stroke:#64748B,stroke-width:1.5px,stroke-dasharray: 5 5,color:#334155
     class P4_1,P4_2,P4_3 planStep
@@ -198,7 +168,7 @@ flowchart LR
 
 - **跨平台数据对照**：对照 Reddit 广告后台的曝光、点击、花费数据与站内采集到的实际访问事件。
 - **核对归属与身份合并**：核对首次广告到站归属规则、观察窗口天数以及匿名访客到注册用户的身份合并逻辑。
-- **输出转化漏斗**：排查链接参数丢失、重复计数或跨平台统计口径不一致的问题，输出准确的注册与激活漏斗。
+- **输出注册与激活漏斗**：排查链接参数丢失、重复计数或跨平台统计口径不一致的问题，输出准确的注册与激活漏斗。
 
 ---
 
@@ -210,26 +180,11 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    subgraph A["第一部分：广告核对与素材归档"]
-        S1(["步骤 1：核对广告平台真实投放记录，确认最终上线素材与参数"])
-        S2(["步骤 2：用脚本检查 CSV 引用素材并平铺打包为可复用 ZIP 导入包"])
-        S3(["步骤 3：保存单广告素材对照表与标注抓取日期的落地页完整长截图"])
-        S1 --> S2
-        S2 --> S3
-    end
-
-    subgraph B["第二部分：跨平台数据与看板整理"]
-        S4(["步骤 4：合并平台花费与站内转化数据，生成逐广告与逐访客多工作表 Excel"])
-        S5(["步骤 5：更新 PostHog 主看板与分广告转化漏斗，验证筛选器与统计口径"])
-        S4 --> S5
-    end
-
-    subgraph C["第三部分：正式入口汇总"]
-        S6(["步骤 6：汇总复投包、Excel 表、素材截图、看板与会话链接至 Notion 正式入口"])
-    end
-
-    S3 --> S4
-    S5 --> S6
+    S1["1. 核对广告与最终素材"] --> S2["2. 打包可复用 ZIP 导入包"]
+    S2 --> S3["3. 保存素材与落地页截图"]
+    S3 --> S4["4. 生成投放与行为 Excel 表"]
+    S4 --> S5["5. 更新并验证 PostHog 看板"]
+    S5 --> S6["6. 汇总至 Notion 正式入口"]
 
     classDef stepA fill:#EFF6FF,stroke:#2563EB,stroke-width:1.5px,color:#1E3A8A
     classDef stepB fill:#FEF3C7,stroke:#D97706,stroke-width:1.5px,color:#78350F
