@@ -64,14 +64,16 @@ def request_data(endpoint, params):
 
 
 def is_removed_record(record):
-    if record.get("removed_by_category"):
-        return True
     title = str(record.get("title") or "").strip().lower()
     if "[ removed" in title or title in REMOVED_MARKERS:
         return True
     for field in ("selftext", "body"):
         if field in record and str(record.get(field) or "").strip().lower() in REMOVED_MARKERS:
             return True
+    # Arctic Shift 二次抓取已过审正文后仍可能残留 automod_filtered，仅对无正文且低互动帖参考该字段
+    has_text = bool(str(record.get("selftext") or record.get("body") or "").strip())
+    if not has_text and record.get("removed_by_category") and int(record.get("num_comments") or 0) <= 2:
+        return True
     return False
 
 
@@ -228,8 +230,8 @@ def post_url(post, subreddit):
 def matches_keywords(post, keywords):
     if not keywords:
         return True
-    haystack = f"{post.get('title') or ''}\n{post.get('selftext') or ''}".lower()
-    return any(word.lower() in haystack for word in keywords)
+    haystack = f"{post.get('title') or ''}\n{post.get('selftext') or ''}"
+    return any(re.search(rf"\b{re.escape(word)}\b", haystack, re.IGNORECASE) for word in keywords)
 
 
 def format_subreddit_peek(

@@ -30,10 +30,16 @@ class CommunityDiscoveryTests(unittest.TestCase):
             {"author": "[deleted]", "num_comments": 20, "selftext": "hello"},
             {"author": "AutoModerator", "num_comments": 15, "selftext": "pinned"},
             {"author": "spam_bot", "num_comments": 10, "selftext": "[removed]"},
-            {"author": "mod_nuked", "num_comments": 8, "removed_by_category": "moderator"},
+            {"author": "mod_nuked", "num_comments": 1, "removed_by_category": "moderator"},
             {"author": "promo_poster", "num_comments": 0, "selftext": "check out my app"},
             {"author": "bob-builder", "num_comments": 4, "score": 10, "selftext": "real question"},
-            {"author": "alice_dev", "num_comments": 18, "score": 30, "selftext": "deep workflow"},
+            {
+                "author": "alice_dev",
+                "num_comments": 18,
+                "score": 30,
+                "removed_by_category": "automod_filtered",
+                "selftext": "deep workflow",
+            },
             {"author": "ALICE_DEV", "num_comments": 6, "score": 5, "selftext": "followup"},
         ]
         self.assertEqual(
@@ -134,7 +140,7 @@ class CommunityDiscoveryTests(unittest.TestCase):
                 "author": "dev_one",
                 "score": 50,
                 "num_comments": 22,
-                "selftext": "Terminal flag tips.",
+                "selftext": "Avoid overwriting config files.",
             },
             {
                 "id": "1low",
