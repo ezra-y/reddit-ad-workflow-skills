@@ -49,6 +49,8 @@ flowchart TD
 
 ## 1. 选择社区、取得材料
 
+尚未确定目标社区、需要根据业务场景或用户痛点寻找合理 subreddit 时，先使用 [`reddit-community-discovery`](../reddit-community-discovery/SKILL.md) 选出视角互补的社区组合，再进入本步骤采集。
+
 按 [collection.md](references/collection.md) 认识相关工具与用户任务，选择社区，取得范围内可获取的帖子和评论。保存原文、回复关系、时间、作者、链接及资料缺口。主题分布使用全部取得的资料。
 
 脚本负责采集、整理和统计，内容理解由 Agent 完成。外部模型服务、费用与调用范围遵循本次授权。

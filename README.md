@@ -1,17 +1,20 @@
 # Reddit 广告全流程 Agent Skills
 
-本仓库存放面向 Reddit 广告投放全流程的 AI Agent Skills（智能体技能）。整套工作流由五个前后衔接的技能组成，覆盖社区真实需求调研、具体广告方案制定、平台投放执行、跨平台转化归因，以及投放结束后的素材包与数据看板归档。
+本仓库存放面向 Reddit 广告投放全流程的 AI Agent Skills（智能体技能）。整套工作流由六个前后衔接的技能组成，覆盖按场景发现合理目标社区、社区真实需求调研、具体广告方案制定、平台投放执行、跨平台转化归因，以及投放结束后的素材包与数据看板归档。
 
-## 五阶段整体工作流
+## 全流程阶段概览
 
 ```mermaid
 flowchart TD
+    S0["前置选圈：按场景发现社区 · reddit-community-discovery（已收录）"]
     S1["1. 社区需求调研 · reddit-community-research（已收录）"]
     S2["2. 广告创意与出图 · reddit-ad-creative（已收录）"]
     S3["3. 从方案到 Reddit 投放 · reddit-ad-launch（已收录）"]
     S4["4. 广告归因与转化追踪（规划中）"]
     S5["5. 投放后资料与数据归档 · ad-campaign-archive（已收录）"]
 
+    S0 --> S1
+    S0 -.->|"按场景补充定向候选"| S3
     S1 --> S2
     S2 --> S3
     S3 --> S4
@@ -20,12 +23,13 @@ flowchart TD
 
     classDef ready fill:#DCFCE7,stroke:#16A34A,stroke-width:2px,color:#14532D
     classDef planned fill:#F8FAFC,stroke:#64748B,stroke-width:1.5px,stroke-dasharray: 5 5,color:#334155
-    class S1,S2,S3,S5 ready
+    class S0,S1,S2,S3,S5 ready
     class S4 planned
 ```
 
 | 阶段 | 技能 | 状态 | 主要产出 |
 | --- | --- | --- | --- |
+| 前置选圈 | [`reddit-community-discovery`](skills/reddit-community-discovery/SKILL.md) | 已收录 | 视角互补的合理目标社区清单、真实场景代表帖直达链接、下游一键采集命令 |
 | 第一阶段 | [`reddit-community-research`](skills/reddit-community-research/SKILL.md) | 已收录 | SQLite 原始资料库、逐帖需求记录、Notion 调研报告、FigJam 机会空间白板 |
 | 第二阶段 | [`reddit-ad-creative`](skills/reddit-ad-creative/SKILL.md) | 已收录 | Reddit 信息流主图（`4:5` / `4:3` / `1:1`）、独立重绘的 `4:3`（`400×300`）大字版缩略图、同步至 Notion 的成品与心理学拆解文档 |
 | 第三阶段 | [`reddit-ad-launch`](skills/reddit-ad-launch/SKILL.md) | 已收录 | 当前账户模板的导入表与素材包、逐条广告追踪链接、上线检查与实际状态记录 |
@@ -35,6 +39,40 @@ flowchart TD
 ---
 
 ## 各阶段技能详解
+
+### 0. 按场景发现合理的 Reddit 社区（`reddit-community-discovery`，已收录）
+
+**核心职责**：在尚未确定具体研究或投放哪些 subreddit 时，从业务场景、产品方向或用户痛点出发，找出**真实讨论该场景、视角互补的合理社区组合**，解决“先去哪些社区找人”的问题。
+
+```mermaid
+flowchart LR
+    D1["拆解日常口语线索"] --> D2["搜场景真帖 + 查同批作者常逛社区"] --> D3["peek 抽看近期讨论"] --> D4["交付视角互补社区组合"]
+
+    classDef readyStep fill:#DCFCE7,stroke:#16A34A,stroke-width:1.5px,color:#14532D
+    class D1,D2,D3,D4 readyStep
+```
+
+- **拆解日常搜帖线索**：把抽象业务词转化为目标用户在帖子里实际会写的具体任务动作、求助原话、现有替代工具与人群角色。
+- **双路挖掘候选社区**：一边搜真实场景帖看讨论落在哪里并收集发帖作者，一边通过 Arctic Shift 作者互动接口（`/users/interactions/subreddits`）与社区侧边栏友链提取，找出多位目标作者近期共同活跃的社区及版主整理的姊妹社区。
+- **抽样核实日常讨论**：拉取候选社区简介、实时订阅人数与近期帖子标题和摘要，确认社区日常讨论贴合目标场景，最终组合核心品类圈、工作流工具圈、人群身份圈与上下游邻近圈交付下游采集。
+
+#### 配套命令行工具
+
+`skills/reddit-community-discovery/scripts/community_discovery.py` 提供作者跨社区共同活跃拓展与候选社区近期真帖速览功能（基于 Python 标准库）：
+
+```bash
+# 顺着已知种子社区或聊过目标场景的真实作者，发现多位目标用户共同活跃的关联社区
+python3 skills/reddit-community-discovery/scripts/community_discovery.py expand \
+  --seed-subreddit <种子社区> \
+  --author <作者名> \
+  --prefix <词根前缀>
+
+# 快速查看候选社区的简介、实时订阅人数与近期真实帖子
+python3 skills/reddit-community-discovery/scripts/community_discovery.py peek \
+  --subreddit <候选社区>
+```
+
+---
 
 ### 1. 社区需求调研与机会空间构建（`reddit-community-research`，已收录）
 
@@ -239,6 +277,9 @@ python3 skills/ad-campaign-archive/scripts/package_assets.py \
 
 | 路径 | 说明 |
 | --- | --- |
+| [`skills/reddit-community-discovery/SKILL.md`](skills/reddit-community-discovery/SKILL.md) | 前置选圈：按业务场景发现合理目标社区组合的技能主指令 |
+| [`skills/reddit-community-discovery/scripts/community_discovery.py`](skills/reddit-community-discovery/scripts/community_discovery.py) | 目标作者跨社区共同活跃图谱扩展（`expand`）与候选社区近期真帖速览（`peek`）脚本 |
+| [`skills/reddit-community-discovery/tests/`](skills/reddit-community-discovery/tests) | `community_discovery.py` 的单元测试 |
 | [`skills/reddit-community-research/SKILL.md`](skills/reddit-community-research/SKILL.md) | 第一阶段：Reddit 社区需求调研与机会空间构建技能主指令 |
 | [`skills/reddit-community-research/references/`](skills/reddit-community-research/references) | 采集工具说明、需求提取规则、机会空间树分类规则、定位与广告卡片写法、选做专题与双端交付规范 |
 | [`skills/reddit-community-research/scripts/reddit_research.py`](skills/reddit-community-research/scripts/reddit_research.py) | Reddit 历史数据采集、SQLite 存储、初筛分批、讨论树读取与去重统计脚本 |
@@ -264,17 +305,19 @@ python3 skills/ad-campaign-archive/scripts/package_assets.py \
 git clone https://github.com/ezra-y/reddit-ad-workflow-skills.git
 
 # 挂载到全局技能目录（按你使用的工具路径选择）
+ln -s "$(pwd)/reddit-ad-workflow-skills/skills/reddit-community-discovery" ~/.claude/skills/reddit-community-discovery
 ln -s "$(pwd)/reddit-ad-workflow-skills/skills/reddit-community-research" ~/.claude/skills/reddit-community-research
 ln -s "$(pwd)/reddit-ad-workflow-skills/skills/reddit-ad-creative" ~/.claude/skills/reddit-ad-creative
 ln -s "$(pwd)/reddit-ad-workflow-skills/skills/reddit-ad-launch" ~/.claude/skills/reddit-ad-launch
 ln -s "$(pwd)/reddit-ad-workflow-skills/skills/ad-campaign-archive" ~/.claude/skills/ad-campaign-archive
 ```
 
-第三阶段的素材打包复用 `ad-campaign-archive`，使用时同时保留该技能。通过 `agents-kit` 管理技能的环境，使用其导入与启用命令统一管理这两个技能。
+第三阶段的素材打包复用 `ad-campaign-archive`，使用时同时保留该技能。通过 `agents-kit` 管理技能的环境，使用其导入与启用命令统一管理。
 
-运行单元测试验证调研与创意脚本：
+运行单元测试验证社区发现、需求调研与创意脚本：
 
 ```bash
+python3 skills/reddit-community-discovery/tests/test_community_discovery.py
 PYTHONPATH=skills/reddit-community-research python3 -m unittest skills/reddit-community-research/tests/test_reddit_research.py
 python3 skills/reddit-ad-creative/tests/test_ad_playbook.py
 ```

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reddit 场景社区发现"
+  short_description: "根据业务场景挖掘视角互补的合理 Reddit 社区组合，附真实代表帖与下游采集命令"
+  default_prompt: "使用 $reddit-community-discovery 围绕给定业务场景或用户痛点，拆解日常英文检索线索，结合真实场景帖检索与目标作者跨社区共同活跃图谱挖掘候选社区，抽样核实近期讨论后输出视角互补的合理 Reddit 社区清单（含人群定位、入选理由、真实代表帖链接及下游多社区采集命令）。"
