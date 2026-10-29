@@ -7,8 +7,8 @@
 ```mermaid
 flowchart TD
     S1["1. 社区需求调研 · reddit-community-research（已收录）"]
-    S2["2. 具体广告方案制定（规划中）"]
-    S3["3. 从方案到 Reddit 投放（规划中）"]
+    S2["2. 广告创意与出图 · reddit-ad-creative（已收录）"]
+    S3["3. 从方案到 Reddit 投放 · reddit-ad-launch（已收录）"]
     S4["4. 广告归因与转化追踪（规划中）"]
     S5["5. 投放后资料与数据归档 · ad-campaign-archive（已收录）"]
 
@@ -20,15 +20,15 @@ flowchart TD
 
     classDef ready fill:#DCFCE7,stroke:#16A34A,stroke-width:2px,color:#14532D
     classDef planned fill:#F8FAFC,stroke:#64748B,stroke-width:1.5px,stroke-dasharray: 5 5,color:#334155
-    class S1,S5 ready
-    class S2,S3,S4 planned
+    class S1,S2,S3,S5 ready
+    class S4 planned
 ```
 
 | 阶段 | 技能 | 状态 | 主要产出 |
 | --- | --- | --- | --- |
 | 第一阶段 | [`reddit-community-research`](skills/reddit-community-research/SKILL.md) | 已收录 | SQLite 原始资料库、逐帖需求记录、Notion 调研报告、FigJam 机会空间白板 |
-| 第二阶段 | 调研后的具体广告方案技能 | 规划中 | 结构化广告方案文档、分受众文案与视觉制作清单、实验对照设计 |
-| 第三阶段 | 从方案到 Reddit 投放技能 | 规划中 | 平台标准批量导入表、带 UTM（来源追踪参数）落地链接、上线核对清单 |
+| 第二阶段 | [`reddit-ad-creative`](skills/reddit-ad-creative/SKILL.md) | 已收录 | Reddit 信息流主图（`4:3` / `1:1`）、独立重绘的 `4:3`（`400×300`）大字版缩略图、同步至 Notion 的极简成品与推导文档 |
+| 第三阶段 | [`reddit-ad-launch`](skills/reddit-ad-launch/SKILL.md) | 已收录 | 当前账户模板的导入表与素材包、逐条广告追踪链接、上线检查与实际状态记录 |
 | 第四阶段 | 广告归因与转化追踪技能 | 规划中 | 归因审计报告、首次广告到站归属规则、注册与核心行为转化漏斗 |
 | 第五阶段 | [`ad-campaign-archive`](skills/ad-campaign-archive/SKILL.md) | 已收录 | 可复用广告导入 ZIP 包、落地页截图存档、多工作表 Excel、PostHog 看板、Notion 汇总页 |
 
@@ -65,25 +65,26 @@ flowchart TD
 #### 六个步骤说明
 
 1. **确认研究目标与产品边界**：明确要研究的产品、目标人群和需要回答的问题；提前核清我方产品已经具备的真实能力，保证后续推导出的广告承诺都能兑现。
-2. **采集与管理原始社区讨论**：通过配套脚本从 Arctic Shift（Reddit 历史公共归档接口）或已有导出文件采集指定时间范围的帖子和评论，保存在本地 SQLite 数据库中，保留回复层级并按编号去重。
-3. **按社区并行初筛与精读**：每个目标社区分配独立分析任务，逐帖阅读正文与评论链，用大白话写清用户在什么场景下遇到了什么困难、想要什么结果，并标记问题归属（目标平台自身问题、迁移摩擦、上下游工具问题等）。
+2. **采集与管理原始社区讨论**：通过配套脚本从 Arctic Shift（Reddit 历史公共归档接口）或已有导出文件采集一个或多个指定社区与时间范围的帖子和评论，保存在本地 SQLite 数据库中，保留回复层级、身份标签（`author_flair`）、赞同率与争议标记，并按编号去重。
+3. **按社区并行初筛与精读**：每个目标社区分配独立分析任务，逐帖阅读正文与评论链，用大白话写清用户在什么场景下遇到了什么困难、想要什么结果，标记问题归属（目标平台自身问题、迁移摩擦、上下游工具问题等）与真实行动三档等级（`acted` 已行动、`seeking` 寻找方案、`expressing` 仅表达感受，附同作者原话证据）。
 4. **构建机会空间树并人工核对**：
-   - 从中间层的**机会空间**出发：合并发生在同一业务环节、直指同一具体障碍的需求，标题用日常白话直说用户想减少什么阻碍或办成什么事，并统计去重后的帖子数、评论数和独立作者数。
+   - 从中间层的**机会空间**出发：合并发生在同一业务环节、直指同一具体障碍的需求，标题用日常白话直说用户想减少什么阻碍或办成什么事，并统计去重后的独立讨论数、账号数、评论数、真实行动等级分布、高争议主帖数及分社区统计（`by_subreddit`）。
    - 向上归纳 **Outcome Space（期望结果空间）**：提炼用户在业务上追求的顶层结果。
-   - 向下推导**解决方案与广告方向**：结合买方视角竞争定位（April Dunford Positioning：竞争参照系、独特属性、用户价值、最在意的细分人群、市场类别），按用户的真实购买理由拆分独立的广告卡片，写出目标人群、痛点钩子、可验证的产品承诺和画面方向。
+   - 向下推导**解决方案与广告方向**：结合买方视角竞争定位（April Dunford Positioning：竞争参照系、独特属性、用户价值、最在意的细分人群、市场类别），按用户的真实购买理由拆分独立的广告卡片，写出目标人群、重点投放社区、痛点钩子、可验证的产品承诺和画面方向。
    - 逐项人工核对代表帖原话，确保代表帖直指该分支痛点，且用户的事实经历与主观猜测分开呈现。
 5. **按需增补研究专题**：针对未回答的问题，选用社区对比选择、主要用户画像、API 平台评价、模型评价、用户旅程或 Kano 需求分类专题。
-6. **Notion 与 FigJam 双端同步交付**：将完整报告写入 Notion，并在 FigJam 中用规范色卡绘制四层机会空间树，两边的一、二级编号、标题、统计数字与代表帖完全一致。
+6. **Notion 与 FigJam 双端同步交付**：将完整报告与分社区、分行动等级统计写入 Notion，并在 FigJam 中用规范色卡绘制简明四层机会空间树，两边的一、二级编号、标题、核心讨论数与代表帖一一对应。
 
 #### 配套命令行工具
 
 `skills/reddit-community-research/scripts/reddit_research.py` 提供确定性的数据采集、分批与去重统计功能（基于 Python 3.10+ 标准库）：
 
 ```bash
-# 1. 按时间范围采集指定社区的帖子与评论
+# 1. 按时间范围采集一个或多个指定社区的帖子与评论
 python3 skills/reddit-community-research/scripts/reddit_research.py collect \
   --db /path/to/research.sqlite \
   --subreddit openrouter \
+  --subreddit LocalLLaMA \
   --after 2026-09-15 \
   --before 2026-09-16
 
@@ -108,7 +109,7 @@ python3 skills/reddit-community-research/scripts/reddit_research.py thread \
   --post-id t3_example \
   --out /path/to/thread.json
 
-# 5. 按机会空间去重统计帖子数、评论数与独立作者数
+# 5. 校验行动证据，按机会空间去重统计讨论数、真实行动分布与分社区分布
 python3 skills/reddit-community-research/scripts/reddit_research.py count \
   --db /path/to/research.sqlite \
   --findings /path/to/findings.jsonl \
@@ -118,39 +119,57 @@ python3 skills/reddit-community-research/scripts/reddit_research.py count \
 
 ---
 
-### 2. 调研后的具体广告方案技能（规划中）
+### 2. 广告创意构思、按规格生图与无损精修（`reddit-ad-creative`，已收录）
 
-**核心职责**：承接第一阶段产出的机会空间树与广告方向卡片，将高优先级的机会转化为可直接投入生产的广告方案。
+**核心职责**：承接第一阶段产出的机会空间树与痛点证据，调用内置的**深层心理学与视觉修辞卡片库**（涵盖抓心心理机制、视觉叙事与构图技巧、标题与文案修辞、切入定位与说服技巧四大维度），通过三阶段工作流产出结构化广告创意简报、Reddit 信息流主图与独立重绘的 `4:3` 超大字缩略图。
 
 ```mermaid
 flowchart LR
-    P2_1["1. 筛选机会与受众"] --> P2_2["2. 编写文案与画面脚本"] --> P2_3["3. 设计落地页承接"]
+    P2_1["阶段一：洞察发现与创意构思<br/>catalog 选卡 -> show 读原理 -> 撰写创意简报"] --> P2_2["阶段二：按规格生图与大字缩略图<br/>多版差异化主图 + 独立生成 400×300 大字缩略图"] --> P2_3["阶段三：视觉质量审查与局部精修<br/>双表质量审查 + 锁面部光影色温无损修补"]
 
-    classDef planStep fill:#F8FAFC,stroke:#64748B,stroke-width:1.5px,stroke-dasharray: 5 5,color:#334155
-    class P2_1,P2_2,P2_3 planStep
+    classDef readyStep fill:#DCFCE7,stroke:#16A34A,stroke-width:1.5px,color:#14532D
+    class P2_1,P2_2,P2_3 readyStep
 ```
 
-- **筛选机会与受众**：挑选证据最充足、转化潜力最高的机会空间分支，明确本轮测试的受众社区与人群定向。
-- **编写文案与画面脚本**：为每个独立购买理由编写完整的广告标题（Headline）、正文钩子（Body Copy）、行动号召（CTA）以及对应的视觉画面脚本。
-- **设计落地页承接**：设计配套落地页的首屏文案与转化路径，保证用户点击广告后的页面信息与广告承诺一致。
+- **阶段一（洞察发现与创意构思）**：运行 `ad_playbook.py catalog` 浏览理论卡片菜单，结合社区语境挑选最匹配的心理机制、视觉载体、修辞招式与说服切入策略，再运行 `show` 精读完整底层原理与使用要点，输出结构化创意简报。
+- **阶段二（按规格生图与制作大字缩略图）**：按内容形态选定 Reddit 信息流主图比例（`4:3` `1440×1080` 或 `1:1` `1080×1080`），锁死全英文逐字原文并生成构图方向各异的满画幅候选主图；同时针对紧凑视图专门生成精简字数、放大主体的 `4:3`（`400 × 300 px`，$\le 500\text{ KB}$）超大字缩略图。
+- **阶段三（视觉质量审查、局部精修与 Notion 极简交付）**：内部对照【原则表 A】与【原则表 B】逐项核对并在保持人物五官、光影与色温一致的前提下完成局部无损修补；最终向人交付并同步写入 Notion 的文档保持极简，只放最终广告图、配套外标题与推导说明（含数据计算依据）。
+
+#### 配套命令行工具
+
+`skills/reddit-ad-creative/scripts/ad_playbook.py` 提供卡片目录检索与单卡完整原理调取功能（基于 Python 3.10+ 标准库）：
+
+```bash
+# 1. 列出心理学、视觉构图、文案修辞与说服卡片目录
+python3 skills/reddit-ad-creative/scripts/ad_playbook.py catalog
+
+# 2. 按卡片 ID 展开完整底层原理、画面用法、文案用法与使用要点
+python3 skills/reddit-ad-creative/scripts/ad_playbook.py show \
+  psych_01_pain_reenactment \
+  vis_carrier_01_native_vernacular \
+  copy_07_micro_moment_callout \
+  pers_01_awareness_routing
+```
 
 ---
 
-### 3. 从方案到 Reddit 投放技能（规划中）
+### 3. 从方案到 Reddit 投放（`reddit-ad-launch`，已收录）
 
-**核心职责**：承接第二阶段确认的广告方案与制作好的视觉素材，完成 Reddit Ads（Reddit 广告后台）上线前的批量配置与检查。
+**核心职责**：承接第二阶段的创意与素材，准备社区和关键词候选，与用户确定投放类型、受众、预算和排期，生成追踪链接与导入文件，并按授权完成 Reddit Ads（Reddit 广告后台）的保存、启用与结果核对。
 
 ```mermaid
 flowchart LR
-    P3_1["1. 生成批量配置表"] --> P3_2["2. 配置 UTM 追踪参数"] --> P3_3["3. 核对预算与素材规格"]
+    P3_1["1. 形成并确认投放配置"] --> P3_2["2. 制作追踪链接与导入包"] --> P3_3["3. 检查并按授权投放"]
 
-    classDef planStep fill:#F8FAFC,stroke:#64748B,stroke-width:1.5px,stroke-dasharray: 5 5,color:#334155
-    class P3_1,P3_2,P3_3 planStep
+    classDef readyStep fill:#DCFCE7,stroke:#16A34A,stroke-width:1.5px,color:#14532D
+    class P3_1,P3_2,P3_3 readyStep
 ```
 
-- **生成批量配置表**：生成符合当前账户导入模板规范的广告系列（Campaign）、广告组（Ad Group）和广告创意配置表。
-- **配置追踪参数**：为每条广告配置独立的 UTM 来源追踪参数（`utm_source`、`utm_medium`、`utm_campaign`、`utm_content` 等），支持后续按单条广告追踪效果。
-- **核对预算与素材规格**：核对预算上限、出价策略、投放时段、目标社区与素材文件规格，生成可直接上传后台的投放包。
+- **当前模板与层级配置**：分别处理新建、添加创意和更新已有对象，正确使用平台编号与临时引用，按实际预算对象核算花费。
+- **投放建议与用户选择**：读取现有社区和关键词，提出有依据的候选与分组，明确列出新增内容、预算合计和具体排期，确认尚未确定的选择。
+- **逐条广告追踪**：沿用项目 UTM（来源追踪参数）命名，保存广告、素材、落地链接及真实平台编号的对应关系，交给后续归因环节使用。
+- **导入包与上线核对**：复用 `ad-campaign-archive` 的素材打包工具，核对当前规格、实际页面和优化事件；上传方式由当前后台决定。
+- **按授权执行与核实**：区分文件完成、后台保存和启用投放，执行后重新读取实际配置与平台状态。
 
 ---
 
@@ -224,6 +243,13 @@ python3 skills/ad-campaign-archive/scripts/package_assets.py \
 | [`skills/reddit-community-research/references/`](skills/reddit-community-research/references) | 采集工具说明、需求提取规则、机会空间树分类规则、定位与广告卡片写法、选做专题与双端交付规范 |
 | [`skills/reddit-community-research/scripts/reddit_research.py`](skills/reddit-community-research/scripts/reddit_research.py) | Reddit 历史数据采集、SQLite 存储、初筛分批、讨论树读取与去重统计脚本 |
 | [`skills/reddit-community-research/tests/`](skills/reddit-community-research/tests) | `reddit_research.py` 的单元测试与测试样例数据 |
+| [`skills/reddit-ad-creative/SKILL.md`](skills/reddit-ad-creative/SKILL.md) | 第二阶段：Reddit 广告创意构思、按规格生图与无损精修技能主指令 |
+| [`skills/reddit-ad-creative/library/`](skills/reddit-ad-creative/library) | 4 大 JSON 理论卡片库（涵盖心理机制、视觉模板、标题修辞与说服技巧） |
+| [`skills/reddit-ad-creative/references/`](skills/reddit-ad-creative/references) | 阶段一构思指南、阶段二 Reddit 规格与生图提示词规范、阶段三视觉质量审查与局部无损精修指南 |
+| [`skills/reddit-ad-creative/scripts/ad_playbook.py`](skills/reddit-ad-creative/scripts/ad_playbook.py) | 理论卡片目录检索与单卡详情展开脚本 |
+| [`skills/reddit-ad-creative/tests/`](skills/reddit-ad-creative/tests) | `ad_playbook.py` 与 4 大卡片库跨引用完整性的自动化测试 |
+| [`skills/reddit-ad-launch/SKILL.md`](skills/reddit-ad-launch/SKILL.md) | 第三阶段：从已确认方案与素材到 Reddit 投放的技能主指令 |
+| [`skills/reddit-ad-launch/references/`](skills/reddit-ad-launch/references) | 投放建议、七类设置的逐项确认清单、批量导入、追踪链接与交接、上线检查；打包工具复用第五阶段 |
 | [`skills/ad-campaign-archive/SKILL.md`](skills/ad-campaign-archive/SKILL.md) | 第五阶段：广告投放后资料与数据归档技能主指令 |
 | [`skills/ad-campaign-archive/references/`](skills/ad-campaign-archive/references) | 归档交付物清单、Reddit 导入包规范、Excel 与 PostHog 看板口径说明及会话总结依据 |
 | [`skills/ad-campaign-archive/scripts/package_assets.py`](skills/ad-campaign-archive/scripts/package_assets.py) | 广告导入 CSV 与图片素材核对及 ZIP 平铺打包脚本 |
@@ -239,11 +265,16 @@ git clone https://github.com/ezra-y/reddit-ad-workflow-skills.git
 
 # 挂载到全局技能目录（按你使用的工具路径选择）
 ln -s "$(pwd)/reddit-ad-workflow-skills/skills/reddit-community-research" ~/.claude/skills/reddit-community-research
+ln -s "$(pwd)/reddit-ad-workflow-skills/skills/reddit-ad-creative" ~/.claude/skills/reddit-ad-creative
+ln -s "$(pwd)/reddit-ad-workflow-skills/skills/reddit-ad-launch" ~/.claude/skills/reddit-ad-launch
 ln -s "$(pwd)/reddit-ad-workflow-skills/skills/ad-campaign-archive" ~/.claude/skills/ad-campaign-archive
 ```
 
-运行单元测试验证调研脚本：
+第三阶段的素材打包复用 `ad-campaign-archive`，使用时同时保留该技能。通过 `agents-kit` 管理技能的环境，使用其导入与启用命令统一管理这两个技能。
+
+运行单元测试验证调研与创意脚本：
 
 ```bash
 PYTHONPATH=skills/reddit-community-research python3 -m unittest skills/reddit-community-research/tests/test_reddit_research.py
+python3 skills/reddit-ad-creative/tests/test_ad_playbook.py
 ```

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reddit 广告创意与出图"
+  short_description: "调用深层心理学与视觉修辞卡片，产出 Reddit 广告主图、4:3 大字版缩略图，并将极简成片与推导说明同步至 Notion"
+  default_prompt: "使用 $reddit-ad-creative，先运行 scripts/ad_playbook.py catalog 浏览理论与技巧卡片，挑选契合当前社区痛点与受众认知阶段的卡片组合并运行 show 阅读完整原理；按 Reddit 官方规格生成视觉方向各异的满画幅候选主图与独立重绘的 4:3（400×300）超大字缩略图，内部对照原则表 A 与原则表 B 完成审查与局部无损精修后，产出仅含最终图片、配套标题与推导说明的极简交付文档并同步写入 Notion。"

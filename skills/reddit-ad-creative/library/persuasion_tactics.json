@@ -1,0 +1,163 @@
+[
+  {
+    "id": "pers_01_awareness_routing",
+    "category": "entry_positioning",
+    "dimension_name": "开口切入策略：决定第一句话从哪一层信息讲起",
+    "name": "受众认知阶段切入定位（Schwartz Stages of Awareness Routing）",
+    "source": "Schwartz, E. M. (1966, Breakthrough Advertising)",
+    "summary": "根据目标社区当前所处的认知阶段，精准选择广告第一眼的开口切入层。",
+    "when_to_use": "拿不准第一句话该先讲痛点、先讲机制还是直接报价格指标，需根据目标社区对问题与竞品的熟悉程度确定开口层级时调用。",
+    "principle": "尤金·施瓦茨在《突破性广告》中指出：广告无法凭空制造需求，只能承接受众脑中已经存在的关切。若受众正受困于具体痛点（Problem Aware），直接罗列参数会被忽略；若受众已在横向比对多家方案（Solution / Most Aware），仍在铺垫基础痛点则会显得冗余。唯有从受众当前正在思考的那一层问题直接开口，才能第一眼建立连接。",
+    "visual_usage": "按认知阶段决定画面重心：痛点感知层直接还原痛点冲突现场与解决出口；方案观望层突出独特运转机制与确定性保障承诺；选型比价层直接呈现多维实测对比或同预算产出对比。",
+    "copy_usage": "外标题与主标题直接锁定对应认知阶段的核心关切，不跨阶段绕弯。",
+    "pitfalls": "每张图聚焦单一认知阶段的关切重点，保持信息层级清晰。",
+    "pairs_with": [
+      "psych_01_pain_reenactment",
+      "pers_02_unique_mechanism",
+      "vis_comp_04_competition"
+    ]
+  },
+  {
+    "id": "pers_02_unique_mechanism",
+    "category": "entry_positioning",
+    "dimension_name": "开口切入策略：决定第一句话从哪一层信息讲起",
+    "name": "市场竞争成熟度与独特机制披露（Market Sophistication & Unique Mechanism）",
+    "source": "Schwartz, E. M. (1966, Breakthrough Advertising); Carpenter, G. S., Glazer, R., & Nakamoto, K. (1994, Journal of Marketing Research)",
+    "summary": "在受众对常规利益口号高度免疫的市场中，直接亮出支撑该结果的独特工作机制，重建理性可信度。",
+    "when_to_use": "市场同类低价或高性能宣传泛滥、老手怀疑结果数字是噱头，需要亮出支撑该结果的底层运作原理建立理性信任时调用。",
+    "principle": "当市场进入高成熟度竞争阶段，受众已经对同质化的利益宣称产生免疫，大脑会自动将缺乏原理支撑的承诺归类为夸大宣传。施瓦茨证明，此时必须交出背后的【独特机制（Unique Mechanism）】，即具体通过何种底层技术或规则设计实现了这一结果，才能给受众的理性判断提供可信支点。",
+    "visual_usage": "在展示核心利益数字的同时，用清晰标识或直观视觉结构标出背后的机制名称。",
+    "copy_usage": "采用核心利益结果加具体机制名称的紧凑结构，让受众一眼理解优势来源。",
+    "pitfalls": "机制命名保持简明直白、一眼可懂。",
+    "pairs_with": [
+      "vis_comp_02_pictorial_analogy",
+      "vis_meaning_01_connection",
+      "pers_05_numeric_specificity"
+    ]
+  },
+  {
+    "id": "pers_03_costly_signaling",
+    "category": "credibility_proof",
+    "dimension_name": "防备破除与硬核背书：让多疑老手彻底信服",
+    "name": "高代价信号与违约自罚承诺（Costly Signaling & Risk Reversal）",
+    "source": "Spence, M. (1973, Quarterly Journal of Economics, Signaling Theory); Kirmani, A., & Rao, A. R. (2000, Journal of Marketing)",
+    "summary": "主动亮出未达承诺标准时由平台承担实际赔付的高代价违约自罚机制，彻底消除试错风险。",
+    "when_to_use": "推广新品牌或做高标准性能承诺，受众担心“口头吹牛不兑现”，而产品拥有未达标自动赔付补偿机制可亮硬底牌时调用。",
+    "principle": "根据迈克尔·斯宾塞的【信号传递理论（Signaling Theory）】与风险逆转研究：口头宣称自身可靠属于零成本信号（Cheap Talk），无法区分真实品质；而明确承诺一旦未达标准即向用户执行高额补偿属于【高代价信号（Costly Signal）】——唯有底层能力确实过硬的提供方才敢承担该违约成本。受众会由此直接推导出产品的高可靠性。",
+    "visual_usage": "将违约自罚与补偿承诺设计为画面中醒目的确定性保障标识，与核心指标紧密绑定。",
+    "copy_usage": "用零歧义的句式直接写明承诺标准与未达标时的具体补偿形式。",
+    "pitfalls": "图上突出呈现最核心的赔付承诺主干，详细结算细则统一放置在落地页。",
+    "pairs_with": [
+      "psych_07_cognitive_offloading",
+      "vis_meaning_01_connection",
+      "pers_05_numeric_specificity"
+    ]
+  },
+  {
+    "id": "pers_04_pratfall_two_sided",
+    "category": "credibility_proof",
+    "dimension_name": "防备破除与硬核背书：让多疑老手彻底信服",
+    "name": "瑕疵效应与双面说服（Pratfall Effect & Two-Sided Persuasion）",
+    "source": "Aronson, E., Willerman, B., & Floyd, J. (1966); Crowley, A. E., & Hoyer, W. D. (1994, Journal of Consumer Research); Ein-Gar, D., Shiv, B., & Tormala, Z. L. (2012, JCR)",
+    "summary": "在多维对比中，先亮出己方压倒性的核心优势，再坦诚保留对手领先的次要单项或如实标出未知项，大幅提升整体真实感。",
+    "when_to_use": "面向极度挑剔多疑的技术老手做多维对比，需要在展示核心压倒性优势的同时坦诚说明适用边界或次要取舍以增强真实感时调用。",
+    "principle": "单面说服（宣称自身在所有维度全部胜出）在高认知受众眼中会立即触发操纵意图警报（Persuasion Knowledge）。根据【双面说服理论（Crowley & Hoyer, 1994）】与【瑕疵效应（Ein-Gar et al., 2012）】：遵循先强后弱顺序，先在受众最关心的核心维度上展示显著胜出，随后在次要维度上坦诚承认对手略优或如实标注暂无数据，能够瞬间解除防备心，使核心优势的可信度大幅提升。",
+    "visual_usage": "在对比表的前排核心位置用品牌高亮色突出己方胜出项，在靠下位置用克制的中性色客观保留对手的次要胜出项与缺失项。",
+    "copy_usage": "数据标注客观中立，如实反映各维度实测表现。",
+    "pitfalls": "保持核心优势在前、次要坦诚在后的排列顺序，确保主卖点稳固突出。",
+    "pairs_with": [
+      "vis_comp_04_competition",
+      "pers_05_numeric_specificity",
+      "psych_13_savvy_insider_identity"
+    ]
+  },
+  {
+    "id": "pers_05_numeric_specificity",
+    "category": "credibility_proof",
+    "dimension_name": "防备破除与硬核背书：让多疑老手彻底信服",
+    "name": "精确数字效应（Numeric Specificity & Precise Anchoring）",
+    "source": "Schindler, R. M., & Yalch, R. F. (2006, Journal of Consumer Research); Xie, G. X., & Kronrod, A. (2012, Journal of Advertising); Caples, J. (1932)",
+    "summary": "摒弃模糊的程度形容词，全部替换为精确到具体位数、带真实计算口径的硬核数字。",
+    "when_to_use": "卖点握有实测命中率、单价差额、赔付阈值或耗时基准，需要把模糊形容词全部替换为精确数值与清晰口径时调用。",
+    "principle": "根据格赖斯合作原则（Gricean Maxims），受众潜意识里认为只有经过严谨测量的数据才会被表述为精确数字，而笼统的形容词往往意味着营销水分（Xie & Kronrod, 2012）。",
+    "visual_usage": "将最关键的精确数字作为画面视觉层级的第一主角，赋予最大字号与最高对比度。",
+    "copy_usage": "凡是可用具体数字表达的维度，均使用精确数值。",
+    "pitfalls": "所有精确数字均源自真实产品定价与实测基准，在提示词中逐字锁定。",
+    "pairs_with": [
+      "copy_10_concrete_unit_reframing",
+      "vis_comp_04_competition",
+      "pers_03_costly_signaling"
+    ]
+  },
+  {
+    "id": "pers_06_zero_shame_validation",
+    "category": "psychological_safety",
+    "dimension_name": "心理安全与行动承接：消除从动心到点击的最后摩擦",
+    "name": "尊重过往选择与零羞耻感切换（Zero-Shame Past-Choice Validation）",
+    "source": "Festinger, L. (1957, Cognitive Dissonance Theory); Aronson, E. (1969)",
+    "summary": "肯定受众过往工具选择的合理性，将切换理由归结为当前使用节奏或需求进阶，消除自我防卫阻力。",
+    "when_to_use": "目标受众当前正深度使用某款主流旧方案，直接贬低旧工具会刺伤其自尊，需先肯定过往选择合理再给出进阶切换台阶时调用。",
+    "principle": "根据费斯汀格的【认知失调理论（Cognitive Dissonance Theory）】，人类有维护自身过往决策合理性的本能。唯有肯定过往选择在特定阶段合理、仅指出新方案更契合当前的使用状态，才能提供体面、无心理阻力的切换台阶。",
+    "visual_usage": "画面对比保持体面、客观、清爽的视觉风格。",
+    "copy_usage": "对标旧方案时客观拆解规则与当前场景的匹配度，语气平视尊重。",
+    "pitfalls": "全程尊重受众过往决策，将切换塑造为顺应当前需求的自然升级。",
+    "pairs_with": [
+      "psych_06_endowment_preservation",
+      "psych_13_savvy_insider_identity",
+      "copy_08_common_enemy_alignment"
+    ]
+  },
+  {
+    "id": "pers_07_autonomy_supportive_cta",
+    "category": "psychological_safety",
+    "dimension_name": "心理安全与行动承接：消除从动心到点击的最后摩擦",
+    "name": "非强迫自主表达（Autonomy-Supportive CTA & Reactance Avoidance）",
+    "source": "Brehm, J. W. (1966, A Theory of Psychological Reactance); Carpenter, C. J. (2013, Communication Studies)",
+    "summary": "摒弃高压催促式的命令口号，采用尊重受众自主验证与自主掌控的平实口吻，消除逆反心理。",
+    "when_to_use": "撰写画面底部副标题或结尾引导，面对反感强推促单口吻的高认知受众，需要用尊重自主验证的平实语气收尾时调用。",
+    "principle": "布雷姆的【心理抗拒理论（Psychological Reactance Theory）】证实，当高认知个体感受到外部信息试图强行命令或操纵其决策时，会产生强烈的本能逆反。将控制权明确交还给受众、提供客观可验证的行动入口，能够解除逆反防御并提升主动点击率。",
+    "visual_usage": "底部行动指引区域保持干净克制的原生文字排版。",
+    "copy_usage": "使用客观验证、自主探索或低门槛体验的表述。",
+    "pitfalls": "保持从容笃定的邀请语气，把决策权完全交予受众。",
+    "pairs_with": [
+      "psych_12_self_determination",
+      "pers_08_fogg_bmap_friction"
+    ]
+  },
+  {
+    "id": "pers_08_fogg_bmap_friction",
+    "category": "psychological_safety",
+    "dimension_name": "心理安全与行动承接：消除从动心到点击的最后摩擦",
+    "name": "福格行为模型 B=MAP 低门槛承接（Fogg Behavior Model Friction Removal）",
+    "source": "Fogg, B. J. (2009, A Behavior Model for Persuasive Design, Persuasive '09)",
+    "summary": "确保每条广告同时配齐核心动机（M）、极低行动门槛（A）与清晰触发提示（P），将第一步切换摩擦降至最低。",
+    "when_to_use": "受众虽对核心利益动心但顾虑迁移麻烦或试错成本高，产品具备极简接入方式或极小额起步门槛可在图上直接亮明时调用。",
+    "principle": "BJ Fogg 的行为公式 `B = MAP` 指出：行为（Behavior）只有在动机（Motivation）、极低难度（Ability）与提示（Prompt）同时跨过行动阈值时才会发生。在激发强烈动机的同时，直接在画面或副标题中亮出极低的第一步接入复杂度（Ability），是促成点击的关键。",
+    "visual_usage": "在解决方案旁用精炼文字标出极低的接入或验证门槛。",
+    "copy_usage": "构思方案时逐项配齐 M（由心理钩子提供）、A（具体如何降低第一步操作复杂度）、P（外标题与画面如何引导下一步动作）。",
+    "pitfalls": "在激发情绪动机的同时，明确交代极低的第一步行动门槛。",
+    "pairs_with": [
+      "vis_comp_05_interactive_experiment",
+      "psych_06_endowment_preservation",
+      "pers_09_message_match_scent"
+    ]
+  },
+  {
+    "id": "pers_09_message_match_scent",
+    "category": "psychological_safety",
+    "dimension_name": "心理安全与行动承接：消除从动心到点击的最后摩擦",
+    "name": "点击前后认知连贯性与首屏信息气味（Message Match & Information Scent）",
+    "source": "Pirolli, P. (2007, Information Foraging Theory, Oxford University Press); Unbounce Conversion Benchmark Research",
+    "summary": "广告图上承诺的核心数字、独特机制与操作入口，受众点进落地页首屏必须第一眼看到完全对应的验证内容。",
+    "when_to_use": "广告图上给出了具体的测算数字、赔付承诺或功能入口，需要规划点击后落地页首屏如何第一眼对应承接以防跳失时调用。",
+    "principle": "根据皮罗利的【信息觅食理论（Information Foraging Theory）】，受众点击链接依赖的是点击前后的【信息气味连续性（Information Scent）】。受众因广告图上的某个具体数字或保障承诺而点击，进入落地页后，首屏必须立刻呈现与之完全对应的标题、测算工具或验证入口，以维持信息气味连续不断裂。",
+    "visual_usage": "广告图的主色系、核心数字锚点与机制名称，与目标落地页首屏的视觉焦点保持高度呼应。",
+    "copy_usage": "在输出每条广告创意方案时，同步列出落地页首屏必配的承接要素。",
+    "pitfalls": "确保广告图上的每一项核心承诺在落地页首屏均有直接对应的验证入口。",
+    "pairs_with": [
+      "pers_08_fogg_bmap_friction",
+      "pers_05_numeric_specificity",
+      "pers_03_costly_signaling"
+    ]
+  }
+]

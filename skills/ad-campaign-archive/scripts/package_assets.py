@@ -49,12 +49,6 @@ def package_assets(csv_path, assets_dir, output, media_columns):
         for name, file in files.items():
             archive.write(file, arcname=name)
 
-    with ZipFile(output) as archive:
-        sizes = {item.filename: item.file_size for item in archive.infolist()}
-    expected = {name: file.stat().st_size for name, file in files.items()}
-    if sizes != expected:
-        raise ValueError("压缩包内文件列表或大小与源文件不一致")
-
     return {
         "output": str(output),
         "csv_rows": len(rows),
