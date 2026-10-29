@@ -163,30 +163,31 @@ python3 skills/reddit-community-research/scripts/reddit_research.py count \
 
 ```mermaid
 flowchart LR
-    P2_1["阶段一：洞察发现与创意构思<br/>catalog 选卡 -> show 读原理 -> 撰写创意简报"] --> P2_2["阶段二：按规格生图与大字缩略图<br/>多版差异化主图 + 独立生成 400×300 大字缩略图"] --> P2_3["阶段三：视觉质量审查与局部精修<br/>双表质量审查 + 锁面部光影色温无损修补"]
+    P2_1["阶段一：洞察发现与创意构思（catalog 单屏选卡 -> 精选 1~3 张 -> 反说明书自检）"] --> P2_2["阶段二：按规格生图与大字缩略图（跨风格候选主图 + 独立 4:3 大字缩略图）"] --> P2_3["阶段三：视觉审查、局部精修与标准导出（export_specs.py 一键导出 + Notion 交付）"]
 
     classDef readyStep fill:#DCFCE7,stroke:#16A34A,stroke-width:1.5px,color:#14532D
     class P2_1,P2_2,P2_3 readyStep
 ```
 
-- **阶段一（洞察发现与创意构思）**：运行 `ad_playbook.py catalog` 浏览全部理论卡片的名称与适用场景（`when_to_use`），结合社区语境挑选匹配的心理机制、视觉载体、修辞招式与说服切入策略，再运行 `show` 精读完整底层原理与使用要点，明确核心主张、外标题与画面英文文案。
-- **阶段二（按规格生图与制作大字缩略图）**：按内容形态选定 Reddit 信息流主图比例（默认官方推荐 `4:5` 竖图 `1080×1350`，或 `4:3` 横图 `1440×1080`、`1:1` 方图 `1080×1080`），逐字指定全英文画面文案并生成构图方向各异的满画幅候选主图；同时针对紧凑视图专门生成放大核心特写的 `4:3`（`400 × 300 px`，$\le 500\text{ KB}$）超大字缩略图。
-- **阶段三（视觉质量审查、局部精修与 Notion 极简交付）**：内部对照【原则表 A】与【原则表 B】逐项核对并在保持人物五官、光影与色温一致的前提下完成局部无损修补；最终向人交付并同步写入 Notion 的文档保持极简，只放最终广告图、配套外标题与心理学创作拆解说明。
+- **阶段一（洞察发现与创意构思）**：运行 `ad_playbook.py catalog` 单屏浏览全部卡片的名称与适用场景（`when_to_use`），每个方向仅精选 1～3 张最契合的核心卡并运行 `show` 精读，完成「反说明书自检」（确保画面提供文字之外的情绪现场、人物神态、荒诞反差或排印张力，拒绝把文案画成流程图或贴签道具）。
+- **阶段二（按规格生图与制作大字缩略图）**：按内容形态选定 Reddit 信息流主图比例（默认官方推荐 `4:5` 竖图 `1080×1350`，或 `4:3` 横图 `1440×1080`、`1:1` 方图 `1080×1080`），预留安全呼吸边距并生成风格跨度鲜明的候选主图；同时针对紧凑视图专门生成放大单焦点特写的 `4:3`（`400 × 300 px`，$\le 500\text{ KB}$）超大字缩略图。
+- **阶段三（视觉质量审查、无损精修与标准导出）**：内部对照【原则表 A】与【原则表 B】核对并按需局部修补，通过 `export_specs.py` 一键导出精确尺寸 PNG，将最终图片、配套外标题与心理学创作拆解同步写入 Notion。
 
 #### 配套命令行工具
 
-`skills/reddit-ad-creative/scripts/ad_playbook.py` 提供卡片目录检索与单卡完整原理调取功能（基于 Python 3.10+ 标准库）：
+`skills/reddit-ad-creative/scripts/` 提供卡片检索脚本 `ad_playbook.py` 与标准规格导出脚本 `export_specs.py`：
 
 ```bash
-# 1. 列出 53 张心理学、视觉构图、文案修辞与说服卡片的名称及适用场景（when_to_use）
+# 1. 单屏列出 56 张心理学、视觉构图、文案修辞与说服卡片的名称及适用场景
 python3 skills/reddit-ad-creative/scripts/ad_playbook.py catalog
 
-# 2. 按卡片 ID 展开完整底层原理、画面用法、文案用法与使用要点
+# 2. 按卡片 ID 展开精选卡片（单次最多 6 张；每个方向挑 1~3 张核心卡即可）
 python3 skills/reddit-ad-creative/scripts/ad_playbook.py show \
   psych_01_pain_reenactment \
-  vis_carrier_01_native_vernacular \
-  copy_07_micro_moment_callout \
-  pers_01_awareness_routing
+  vis_carrier_03_human_reaction_moment
+
+# 3. 将原始生图导出为精确 Reddit 官方尺寸 PNG（feed-4x5 / feed-4x3 / feed-1x1 / thumb-4x3）
+python3 skills/reddit-ad-creative/scripts/export_specs.py raw.jpg final_1080x1350.png --preset feed-4x5
 ```
 
 ---
@@ -287,8 +288,9 @@ python3 skills/ad-campaign-archive/scripts/package_assets.py \
 | [`skills/reddit-ad-creative/SKILL.md`](skills/reddit-ad-creative/SKILL.md) | 第二阶段：Reddit 广告创意构思、按规格生图与无损精修技能主指令 |
 | [`skills/reddit-ad-creative/library/`](skills/reddit-ad-creative/library) | 4 大 JSON 理论卡片库（涵盖心理机制、视觉模板、标题修辞与说服技巧） |
 | [`skills/reddit-ad-creative/references/`](skills/reddit-ad-creative/references) | 阶段一构思指南、阶段二 Reddit 规格与生图提示词规范、阶段三视觉质量审查与局部无损精修指南 |
-| [`skills/reddit-ad-creative/scripts/ad_playbook.py`](skills/reddit-ad-creative/scripts/ad_playbook.py) | 理论卡片目录检索与单卡详情展开脚本 |
-| [`skills/reddit-ad-creative/tests/`](skills/reddit-ad-creative/tests) | `ad_playbook.py` 与 4 大卡片库跨引用完整性的自动化测试 |
+| [`skills/reddit-ad-creative/scripts/ad_playbook.py`](skills/reddit-ad-creative/scripts/ad_playbook.py) | 理论卡片单屏目录检索与精选卡片详情展开脚本 |
+| [`skills/reddit-ad-creative/scripts/export_specs.py`](skills/reddit-ad-creative/scripts/export_specs.py) | Reddit 官方主图（`4:5` / `4:3` / `1:1`）与缩略图（`400×300`）标准规格导出脚本 |
+| [`skills/reddit-ad-creative/tests/`](skills/reddit-ad-creative/tests) | `ad_playbook.py`、`export_specs.py` 与 4 大卡片库完整性的自动化测试 |
 | [`skills/reddit-ad-launch/SKILL.md`](skills/reddit-ad-launch/SKILL.md) | 第三阶段：从已确认方案与素材到 Reddit 投放的技能主指令 |
 | [`skills/reddit-ad-launch/references/`](skills/reddit-ad-launch/references) | 投放建议、七类设置的逐项确认清单、批量导入、追踪链接与交接、上线检查；打包工具复用第五阶段 |
 | [`skills/ad-campaign-archive/SKILL.md`](skills/ad-campaign-archive/SKILL.md) | 第五阶段：广告投放后资料与数据归档技能主指令 |

@@ -1,10 +1,9 @@
 from datetime import date
 import json
 from pathlib import Path
+import sys
 import tempfile
 import unittest
-
-import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from scripts import community_discovery as discovery
@@ -17,22 +16,28 @@ class CommunityDiscoveryTests(unittest.TestCase):
             discovery.clean_subreddit,
         )
         self.assertEqual(subs, ["OpenRouter", "LocalLLaMA", "opencode"])
+        keywords = discovery.parse_unique(["writing, draft", "Writing"], discovery.clean_keyword)
+        self.assertEqual(keywords, ["writing", "draft"])
         with self.assertRaises(ValueError):
             discovery.clean_subreddit("bad name!")
         with self.assertRaises(ValueError):
             discovery.clean_author("[deleted]")
+        with self.assertRaises(ValueError):
+            discovery.clean_keyword("   ")
 
-    def test_extract_authors_skips_deleted_and_automod_and_deduplicates(self):
+    def test_extract_authors_filters_removed_and_ranks_by_discussion(self):
         posts = [
-            {"author": "[deleted]"},
-            {"author": "AutoModerator"},
-            {"author": "alice_dev"},
-            {"author": "ALICE_DEV"},
-            {"author": "bob-builder"},
-            {"author": "carol_ops"},
+            {"author": "[deleted]", "num_comments": 20, "selftext": "hello"},
+            {"author": "AutoModerator", "num_comments": 15, "selftext": "pinned"},
+            {"author": "spam_bot", "num_comments": 10, "selftext": "[removed]"},
+            {"author": "mod_nuked", "num_comments": 8, "removed_by_category": "moderator"},
+            {"author": "promo_poster", "num_comments": 0, "selftext": "check out my app"},
+            {"author": "bob-builder", "num_comments": 4, "score": 10, "selftext": "real question"},
+            {"author": "alice_dev", "num_comments": 18, "score": 30, "selftext": "deep workflow"},
+            {"author": "ALICE_DEV", "num_comments": 6, "score": 5, "selftext": "followup"},
         ]
         self.assertEqual(
-            discovery.extract_authors(posts, limit=2),
+            discovery.extract_authors(posts, limit=3, min_comments=2),
             ["alice_dev", "bob-builder"],
         )
 
@@ -93,44 +98,91 @@ class CommunityDiscoveryTests(unittest.TestCase):
         self.assertEqual(by_name["LocalLLaMA"]["sidebar_from"], ["openrouter"])
         self.assertEqual(by_name["SillyTavernAI"]["sidebar_from"], ["openrouter"])
 
-    def test_format_subreddit_peek_reads_live_subscribers_and_sidebar_links(self):
+    def test_format_subreddit_peek_filters_removed_keywords_and_ranks_posts(self):
         meta_rows = [
             {
-                "display_name": "opencode",
-                "title": "OpenCode",
-                "description": "Sister subs: r/codex and /r/LocalLLaMA",
+                "display_name": "ClaudeAI",
+                "title": "ClaudeAI",
+                "description": "Sister subs: r/PromptEngineering and /r/LocalLLaMA",
                 "public_description": "",
+                "subscribers": 900000,
+            }
+        ]
+        latest_rows = [
+            {
+                "id": "1newest",
+                "subreddit": "ClaudeAI",
+                "subreddit_subscribers": 1235752,
+                "title": "Brand new post",
+                "selftext": "[removed]",
             }
         ]
         post_rows = [
             {
-                "id": "1abcde",
-                "subreddit": "opencode",
-                "subreddit_subscribers": 55189,
-                "title": "Silent Charges: Failed API Calls Eating Credits",
-                "author": "alice_dev",
-                "score": 42,
-                "num_comments": 19,
-                "link_flair_text": "Discussion",
+                "id": "1removed",
+                "subreddit": "ClaudeAI",
+                "title": "Spam writing tool",
+                "author": "spammer",
+                "score": 1,
+                "num_comments": 0,
+                "selftext": "[removed]",
+            },
+            {
+                "id": "1coding",
+                "subreddit": "ClaudeAI",
+                "title": "Claude Code terminal shortcut",
+                "author": "dev_one",
+                "score": 50,
+                "num_comments": 22,
+                "selftext": "Terminal flag tips.",
+            },
+            {
+                "id": "1low",
+                "subreddit": "ClaudeAI",
+                "title": "Quick writing prompt question",
+                "author": "writer_a",
+                "score": 3,
+                "num_comments": 4,
                 "created_utc": 1760000000,
-                "selftext": "Every time a provider returns 502\n\nwe still get billed.",
-                "permalink": "/r/opencode/comments/1abcde/silent_charges/",
-            }
+                "selftext": "How do you structure outlines?",
+            },
+            {
+                "id": "1high",
+                "subreddit": "ClaudeAI",
+                "title": "Response style feels jarring for prose",
+                "author": "writer_b",
+                "score": 25,
+                "num_comments": 35,
+                "link_flair_text": "Discussion",
+                "created_utc": 1760003600,
+                "selftext": "My long-form writing workflow\n\nneeds less corporate tone.",
+                "permalink": "/r/ClaudeAI/comments/1high/response_style_feels_jarring/",
+            },
         ]
-        peek = discovery.format_subreddit_peek("opencode", meta_rows, post_rows)
-        self.assertEqual(peek["name"], "opencode")
-        self.assertEqual(peek["subscribers"], 55189)
-        self.assertEqual(peek["related_subreddits"], ["codex", "LocalLLaMA"])
-        self.assertEqual(len(peek["recent_posts"]), 1)
+        peek = discovery.format_subreddit_peek(
+            "ClaudeAI",
+            meta_rows,
+            post_rows,
+            latest_rows=latest_rows,
+            keywords=["writing", "prose"],
+            max_posts=5,
+        )
+        self.assertEqual(peek["name"], "ClaudeAI")
+        self.assertEqual(peek["subscribers"], 1235752)
+        self.assertEqual(peek["sampled_count"], 4)
+        self.assertEqual(peek["surviving_count"], 3)
+        self.assertEqual(peek["discussed_count"], 3)
+        self.assertEqual(peek["matched_count"], 2)
+        self.assertEqual(peek["related_subreddits"], ["PromptEngineering", "LocalLLaMA"])
+        self.assertEqual([p["id"] for p in peek["recent_posts"]], ["t3_1high", "t3_1low"])
         first = peek["recent_posts"][0]
-        self.assertEqual(first["id"], "t3_1abcde")
-        self.assertEqual(first["snippet"], "Every time a provider returns 502 we still get billed.")
-        self.assertEqual(first["url"], "https://www.reddit.com/r/opencode/comments/1abcde/silent_charges/")
+        self.assertEqual(first["snippet"], "My long-form writing workflow needs less corporate tone.")
+        self.assertEqual(first["url"], "https://www.reddit.com/r/ClaudeAI/comments/1high/response_style_feels_jarring/")
 
     def test_cli_parser_default_after_and_write_output(self):
         self.assertIsInstance(date.fromisoformat(discovery.default_after_date()), date)
         parser = discovery.build_parser()
-        args = parser.parse_args(
+        expand_args = parser.parse_args(
             [
                 "expand",
                 "--seed-subreddit",
@@ -141,9 +193,24 @@ class CommunityDiscoveryTests(unittest.TestCase):
                 "llm",
             ]
         )
-        self.assertEqual(args.command, "expand")
-        self.assertEqual(args.seed_subreddit, ["r/openrouter"])
-        self.assertFalse(args.all_time)
+        self.assertEqual(expand_args.command, "expand")
+        self.assertEqual(expand_args.seed_subreddit, ["r/openrouter"])
+        self.assertEqual(expand_args.settle_days, 3)
+        self.assertFalse(expand_args.all_time)
+
+        peek_args = parser.parse_args(
+            [
+                "peek",
+                "--subreddit",
+                "ClaudeAI",
+                "--keyword",
+                "writing",
+                "--sample-pool",
+                "80",
+            ]
+        )
+        self.assertEqual(peek_args.keyword, ["writing"])
+        self.assertEqual(peek_args.sample_pool, 80)
 
         with tempfile.TemporaryDirectory() as tmp:
             out = Path(tmp) / "nested" / "result.json"

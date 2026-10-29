@@ -1,79 +1,69 @@
-# 阶段二：Reddit 广告规格、生图提示词与缩略图制作指南
+# 阶段二：Reddit 广告规格、生图提示词与导出指南
 
-在阶段一选定要出图的创意方向后，进入阶段二。本阶段遵循【原则表 B：Reddit 规格与生图原则】，输出两套视觉资产：**信息流主图（多个差异化开放构图候选版）**与**独立重新构图的 `4:3` 超大字缩略图**。
+选定通过「反说明书自检」的创意方向后，进入阶段二生成两套视觉资产：**信息流主图（多个跨风格候选版）**与**独立重新构图的 `4:3` 特写超大字缩略图**。
 
 ---
 
-## 一、Reddit 信息流主图比例与满画幅构图规范（原则 B1）
+## 一、Reddit 信息流主图规格与安全留白（原则 B1）
 
-根据广告画面的内容形态，主图采用以下标准比例：
+| 比例规格 | 标准分辨率 | 导出预设参数（`export_specs.py`） | 适用形态与优势 |
+| :--- | :--- | :--- | :--- |
+| **`4:5` 竖图（默认推荐）** | **`1080 × 1350 px`** | `--preset feed-4x5` | Reddit 手机端信息流纵向面积最大，阅读冲击力强。 |
+| **`4:3` 横图（宽幅规格）** | **`1440 × 1080 px`** | `--preset feed-4x3` | 兼顾桌面端与移动端，适合横向展开的人物场景、桌面现场或宽屏构图。 |
+| **`1:1` 方图（紧凑规格）** | **`1080 × 1080 px`** | `--preset feed-1x1` | 适合紧凑单焦点、分格梗图或居中大字视觉。 |
 
-| 比例规格 | 标准分辨率 | 适用内容形态与投放优势 |
-| :--- | :--- | :--- |
-| **`4:5` 竖图（官方首推默认规格）** | **`1080 × 1350 px`** | **Reddit 官方首选推荐主力规格**，在手机端信息流占据最大纵向屏幕面积，上下排布空间充裕、转化表现最佳。 |
-| **`4:3` 横图（跨端宽幅规格）** | **`1440 × 1080 px`** | **桌面端与手机端兼顾的宽幅规格**，适合左右并列桌面场景或宽屏终端界面，且与 `4:3` 缩略图同比例。 |
-| **`1:1` 方图（分格叙事规格）** | **`1080 × 1080 px`**（或 `1200 × 1200 px`） | **分格叙事与紧凑单焦点规格**。 |
-
-### 画面内部构图与安全区要求
-- **满画幅原生场景（Full-Bleed Scene Composition）**：画面本身就是一个直接铺满画布的完整场景（真实场景摄影、原生软件界面、社区分格叙事插画或大字平面视觉），主文案自然融入场景或留白空间。
-- **安全区与留白要求**：画面中的核心视觉焦点与主文案保持在画幅中央安全区域内，四周留出干净呼吸空间，避开画幅边缘裁切与平台底栏遮挡，品牌署名克制地融入画面角落。
-
-### 零解码直觉、视觉戏眼与跨候选版多样性原则
-在 Reddit 信息流快速滑动中，画面设计遵循以下底层视觉规律：
-1. **零解码直觉与视觉戏眼（Instant Grasp & Visual Hook）**
-   - 画面主体可自由采用真实软件环境、社区原生分格叙事、生活同构比喻或具象物理道具，受众凭日常常识或社区直觉即可第一眼看懂因果关系；由画面自身的动作与反差演完核心冲突，图内文字保持短促点睛。
-2. **跨候选版彻底差异化（Cross-Candidate Visual Diversity）**
-   - 同一条广告并发生成的多个候选版，在**画风媒介、叙事角度与版式结构**上彻底拉开差距，为阶段三提供真正不同风格的择优空间。
+### 内置 `image-generator` 的真实工具边界与留白要点
+1. **原生输出特性**：当前环境的 `image-generator` 子智能体原生输出 `3:4` 竖图（`896 × 1200 px` JPG）或 `4:3` 横图（`1200 × 896 px` JPG），文件自动保存在当前调用智能体自身的目录下，且生图子智能体没有终端移动文件或裁切图片的权限。
+2. **调用方式**：调用 `image-generator` 时，**只传画面提示词与简短英文图片名**，无需让它转换 PNG 或保存到其他目录。
+3. **`3:4` 转 `4:5` 的上下安全留白**：当目标主图为 `4:5` 竖图时，把 `3:4`（偏瘦长）裁切为 `4:5`（偏宽短）会从上下边缘合共裁掉约 `6.7%` 的高度（约 `80 px`）。因此在生图提示词中明确要求：**上下边缘各留出 `10%–12%` 纯净连贯的背景呼吸空间，所有文字与角落小署名统一收在纵向中央 `78%` 安全区域内**。
+4. **一键标准导出**：拿到原始 JPG 并完成阶段三选图后，直接运行内置脚本导出精确分辨率 PNG（无需手写切图脚本）：
+   ```bash
+   python3 scripts/export_specs.py <raw_image.jpg> <final_1080x1350.png> --preset feed-4x5
+   # 如需微调上下裁切重心（0.0 偏上保留顶部，1.0 偏下保留底部，默认 0.5 居中）：
+   python3 scripts/export_specs.py <raw_image.jpg> <final_1080x1350.png> --preset feed-4x5 --top-bias 0.55
+   ```
 
 ---
 
 ## 二、独立生成 `4:3` 特写超大字缩略图规范（原则 B2）
 
-Reddit 的紧凑视图（Compact View / Classic View）以及 `old.reddit.com` 拥有大量高粘性硬核用户。在这些视图下，缩略图仅被渲染为极小尺寸的预览框。
+Reddit 紧凑视图（Compact View / Classic View）与 `old.reddit.com` 的缩略图预览框尺寸极小，直接缩小主图会导致细节糊成一团。
 
-### 规格与构图要求
-- **比例规格**：**`4:3` 横图（`1440 × 1080 px` 或导出 `400 × 300 px`，文件体积 $\le 500\text{ KB}$）**。
-- **核心视觉主体特写放大 + 撑满画幅的超大粗体字**：
-  - 去除主图里的前因铺垫、副标题与次要细节；
-  - **把主图中最具冲突感的单一视觉主体特写放大到占满画幅**；
-  - 压上**精炼短促的超大加粗核心英文短语与关键数字，饱满撑起画幅核心区域**，确保在紧凑视图极小尺寸下依然第一眼看清图案与大字。
-
----
-
-## 三、调用生图模型 API 的提示词准则（原则 B3 & B4）
-
-### 1. 逐字给出画面英文文案（Verbatim Copy）
-- 调用图像生成 API 时，将需要渲染在图片上的英文文案用双引号逐字列出，并在提示词末尾说明：**「English text only on the image, no extra words or invented numbers.」**
-
-### 2. 开放排版自由度与 API 并发生成
-- **锁定什么**：锁定核心视觉主体与因果/对比关系、材质光影基调、画面英文文案。
-- **放开什么**：不在提示词里用死板的像素坐标限制模型的具体排版角度，允许模型在干净留白的前提下自由探索最具张力的构图、字体搭配与主次比例。
-- **并发生成**：每条广告通过 API 并发生成多个不同构图与媒介探索方向的主图候选版，进入阶段三择优录取。
-
-### 3. 品牌克制署名与真实图形 Logo 参考图传入
-- **文字署名位置**：品牌名称在画面角落或底部安全边距内作为克制、体面的小署名出现。
-- **真实图形 Logo 传入**：当画面需要印上品牌真实图形 Logo 或还原真实软件界面时，**直接在生图 API 的参考图参数中传入官方 Logo PNG 或真实界面素材**。
-
-### 4. 真人形象整洁度与社区原生界面还原
-- **人物形象标准**：画面出现真人时，人物气质贴合目标社区受众，设定为面部清爽干净、衣着整洁得体的日常形象，采用柔和真实的自然光线或环境光。
-- **软件界面还原标准**：当画软件界面切片时，提示词精确描述目标软件真实的主题配色、布局结构、图标与系统原生状态样式。
+### 制作与导出步骤
+- **独立构图重绘**：抽离次要背景与长句，将最具情绪或冲突张力的单一焦点特写放大撑满画幅，搭配**超大加粗的核心短词或关键数字**，调用 `image-generator` 以 `4:3` 横图比例单独生成。
+- **一键导出合规缩略图（`400 × 300 px`，$\le 500\text{ KB}$）**：
+  ```bash
+  python3 scripts/export_specs.py <raw_thumb.jpg> <final_thumb_400x300.png> --preset thumb-4x3
+  ```
 
 ---
 
-## 四、生图提示词结构参考
+## 三、生图提示词准则与跨候选版开放探索（原则 B3 & B4）
+
+1. **跨候选版真正拉开风格跨度**：
+   - 同一个方案并发生成的多个候选版，在**视觉媒介、拍摄视角、光影情绪与排版方式**上大胆拉开差距（例如：一张采用真实人物深夜纪实抓拍，另一张采用大胆排印态度海报或荒诞戏剧微缩现场），摆脱“全是深色卡片或桌面静物”的单一套路。
+2. **逐字指定精炼英文文案（Verbatim Copy）**：
+   - 图上只放真正必要的点睛短句与核实数字，将需渲染的英文放在双引号内逐字给出，并在提示词末尾注明：`English text only on the image, no extra words or invented numbers.`
+3. **自由构图与真实参考图传入**：
+   - 把构图动线、字体气质与主次留白交给模型结合画面氛围自然发挥；需要呈现真实品牌图形 Logo 或真实软件界面时，在生图调用中直接传入官方参考图。
+4. **人物自然质感与软件细节还原**：
+   - 画面出现人物时，神态情绪真实鲜活、衣着自然干净、采用有生活呼吸感的环境光影；出现软件局部时，贴合目标社区日常使用的真实界面外观。
+
+---
+
+## 四、生图提示词轻量骨架参考（按创意形态自由增删）
 
 ```text
-[Format & Full-Bleed Composition]
- Aspect ratio: <4:5 portrait (1080x1350) default | 4:3 landscape (1440x1080) | 1:1 square (1080x1080)>.
- Full-bleed edge-to-edge visual scene filling the entire canvas naturally. Keep core focal points and text inside the central safe zone with clean breathing room at the edges.
+[Canvas & Safe Margin]
+ Portrait 3:4 raw frame designed for clean 4:5 (1080x1350) center crop (or 4:3 landscape).
+ Full-bleed scene extending edge-to-edge. Keep ~12% clean background breathing room at the top and bottom edges so all text and focal details sit comfortably inside the central safe zone.
 
-[Core Visual Hook & Scene]
- Core visual subject: <Describe the visual action, contrast, analogy, or interface twist that conveys the point at a single glance, along with coherent style and lighting>.
+[Scene, Mood & Visual Tension]
+ <Describe the human moment, candid reaction, absurdist scene, bold editorial typography, or everyday visual tension — focus on emotion, atmosphere, lighting, and what the image shows BEYOND the words>.
 
-[Verbatim English Typography — Exact Text Only]
- Render ONLY the following exact English strings cleanly and legibly (concise, punchy hierarchy):
- - Primary Copy: "<EXACT HEADLINE>"
- - Optional Secondary / Proof Copy: "<EXACT PROOF TEXT>"
- - Subtle Corner Signoff: "<BRAND NAME>"
+[Verbatim English Copy — Minimal & Exact]
+ Render ONLY the following exact English text integrated naturally into the composition:
+ - "<EXACT SHORT COPY>"
+ (Optional subtle corner signoff if fitting: "<BRAND NAME>")
  English text only on the image, no extra words or invented numbers.
 ```

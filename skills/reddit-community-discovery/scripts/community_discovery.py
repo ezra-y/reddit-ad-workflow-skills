@@ -3,12 +3,14 @@ from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
 import re
+from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 API = "https://arctic-shift.photon-reddit.com/api"
 IGNORED_AUTHORS = {"", "[deleted]", "[removed]", "automoderator"}
 IGNORED_SUBREDDITS = {"all", "popular", "random", "friends", "mod"}
+REMOVED_MARKERS = {"[removed]", "[deleted]"}
 SUBREDDIT_LINK_RE = re.compile(r"(?<![A-Za-z0-9_])/?r/([A-Za-z0-9_]{2,21})\b")
 
 
@@ -28,6 +30,13 @@ def clean_author(value):
     return name
 
 
+def clean_keyword(value):
+    word = str(value).strip()
+    if not word:
+        raise ValueError("关键词不能为空")
+    return word
+
+
 def parse_unique(values, cleaner):
     seen = {}
     for raw in values or ():
@@ -42,19 +51,46 @@ def request_data(endpoint, params):
     clean_params = {key: value for key, value in params.items() if value is not None and value != ""}
     url = f"{API}{endpoint}?{urlencode(clean_params)}"
     request = Request(url, headers={"User-Agent": "reddit-community-discovery/1.0"})
-    with urlopen(request, timeout=30) as response:
-        payload = json.loads(response.read().decode("utf-8"))
+    try:
+        with urlopen(request, timeout=30) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+    except HTTPError as exc:
+        detail = exc.read().decode("utf-8", errors="replace").strip()
+        raise RuntimeError(f"Arctic Shift 请求失败 (HTTP {exc.code}) {url} -> {detail}") from exc
     data = payload.get("data")
     if not isinstance(data, list):
-        raise RuntimeError(f"Arctic Shift 返回异常：{payload}")
+        raise RuntimeError(f"Arctic Shift 返回异常 {url} -> {payload}")
     return data
 
 
-def extract_authors(posts, *, limit=None):
-    # 从帖子列表中提取去重后的真实发帖作者，跳过已删除账号与 AutoModerator
+def is_removed_record(record):
+    if record.get("removed_by_category"):
+        return True
+    title = str(record.get("title") or "").strip().lower()
+    if "[ removed" in title or title in REMOVED_MARKERS:
+        return True
+    for field in ("selftext", "body"):
+        if field in record and str(record.get(field) or "").strip().lower() in REMOVED_MARKERS:
+            return True
+    return False
+
+
+def extract_authors(records, *, limit=None, min_comments=0):
+    # 跳过已被删除的内容与机器人，按评论互动数优先提取真实参与讨论的作者
+    candidates = [
+        row
+        for row in records
+        if not is_removed_record(row)
+        and int(row.get("num_comments") or 0) >= min_comments
+    ]
+    if min_comments > 0:
+        candidates.sort(
+            key=lambda row: (int(row.get("num_comments") or 0), int(row.get("score") or 0)),
+            reverse=True,
+        )
     seen = {}
-    for post in posts:
-        author = str(post.get("author") or "").strip()
+    for row in candidates:
+        author = str(row.get("author") or "").strip()
         if not author or author.lower() in IGNORED_AUTHORS:
             continue
         seen.setdefault(author.lower(), author)
@@ -189,18 +225,34 @@ def post_url(post, subreddit):
     return f"https://www.reddit.com/r/{subreddit}/comments/{post_id}/"
 
 
-def format_subreddit_peek(requested_name, meta_rows, post_rows):
+def matches_keywords(post, keywords):
+    if not keywords:
+        return True
+    haystack = f"{post.get('title') or ''}\n{post.get('selftext') or ''}".lower()
+    return any(word.lower() in haystack for word in keywords)
+
+
+def format_subreddit_peek(
+    requested_name,
+    meta_rows,
+    post_rows,
+    *,
+    latest_rows=(),
+    keywords=(),
+    max_posts=5,
+):
     meta = meta_rows[0] if meta_rows else {}
+    all_posts = list(latest_rows) + list(post_rows)
     name = (
-        str(post_rows[0]["subreddit"]).strip()
-        if post_rows and post_rows[0].get("subreddit")
+        str(all_posts[0]["subreddit"]).strip()
+        if all_posts and all_posts[0].get("subreddit")
         else str(meta.get("display_name") or requested_name).strip()
     )
     # 新建社区可能尚未进入 subreddits 索引，优先读取最新帖子携带的实时订阅人数
     subscribers = next(
         (
             int(post["subreddit_subscribers"])
-            for post in post_rows
+            for post in all_posts
             if post.get("subreddit_subscribers") is not None
         ),
         int(meta["subscribers"]) if meta.get("subscribers") is not None else None,
@@ -210,8 +262,16 @@ def format_subreddit_peek(requested_name, meta_rows, post_rows):
         meta.get("public_description"),
         exclude=[name],
     )
+    surviving = [post for post in post_rows if not is_removed_record(post)]
+    discussed_count = sum(1 for post in surviving if int(post.get("num_comments") or 0) >= 2)
+    matched = [post for post in surviving if matches_keywords(post, keywords)]
+    matched.sort(
+        key=lambda post: (int(post.get("num_comments") or 0), int(post.get("score") or 0)),
+        reverse=True,
+    )
+
     recent_posts = []
-    for post in post_rows:
+    for post in matched[:max_posts]:
         created_utc = post.get("created_utc")
         created_at = (
             datetime.fromtimestamp(int(created_utc), tz=timezone.utc).isoformat()
@@ -238,6 +298,10 @@ def format_subreddit_peek(requested_name, meta_rows, post_rows):
         "title": str(meta.get("title") or "").strip(),
         "public_description": str(meta.get("public_description") or "").strip(),
         "subscribers": subscribers,
+        "sampled_count": len(post_rows),
+        "surviving_count": len(surviving),
+        "discussed_count": discussed_count,
+        "matched_count": len(matched),
         "related_subreddits": related_subreddits,
         "recent_posts": recent_posts,
     }
@@ -253,8 +317,12 @@ def write_output(out_path, payload):
         print(rendered, end="")
 
 
-def default_after_date(days=180):
+def days_ago_date(days):
     return (datetime.now(timezone.utc) - timedelta(days=days)).date().isoformat()
+
+
+def default_after_date(days=180):
+    return days_ago_date(days)
 
 
 def run_expand(args):
@@ -263,7 +331,10 @@ def run_expand(args):
     prefixes = parse_unique(args.prefix, clean_subreddit)
     if not seeds and not authors and not prefixes:
         raise ValueError("请至少提供 --seed-subreddit、--author 或 --prefix 之一")
+    if not 1 <= args.seed_posts <= 100:
+        raise ValueError("--seed-posts 必须在 1 到 100 之间")
 
+    settled_before = days_ago_date(args.settle_days) if args.settle_days > 0 else None
     author_pool = {author.lower(): author for author in authors}
     sidebar_links = {}
     for sub in seeds:
@@ -276,9 +347,20 @@ def run_expand(args):
             )
         posts = request_data(
             "/posts/search",
-            {"subreddit": sub, "limit": args.seed_posts, "sort": "desc"},
+            {"subreddit": sub, "before": settled_before, "limit": args.seed_posts, "sort": "desc"},
         )
-        for author in extract_authors(posts, limit=args.authors_per_seed):
+        seed_authors = extract_authors(posts, limit=args.authors_per_seed, min_comments=2)
+        if len(seed_authors) < args.authors_per_seed:
+            comments = request_data(
+                "/comments/search",
+                {"subreddit": sub, "before": settled_before, "limit": args.seed_posts, "sort": "desc"},
+            )
+            for commenter in extract_authors(comments, limit=args.authors_per_seed):
+                if commenter.lower() not in {name.lower() for name in seed_authors}:
+                    seed_authors.append(commenter)
+                if len(seed_authors) >= args.authors_per_seed:
+                    break
+        for author in seed_authors:
             author_pool.setdefault(author.lower(), author)
 
     # 默认限定近期窗口，聚焦当前活跃社区并避免高发帖老账号触发归档接口超时
@@ -315,16 +397,35 @@ def run_expand(args):
 
 def run_peek(args):
     subreddits = parse_unique(args.subreddit, clean_subreddit)
+    keywords = parse_unique(args.keyword, clean_keyword)
     if not subreddits:
         raise ValueError("请至少提供一个 --subreddit")
+    if not 1 <= args.sample_pool <= 100:
+        raise ValueError("--sample-pool 必须在 1 到 100 之间")
+
+    settled_before = days_ago_date(args.settle_days) if args.settle_days > 0 else None
     items = []
     for sub in subreddits:
         meta_rows = request_data("/subreddits/search", {"subreddit": sub, "limit": 1})
+        latest_rows = (
+            request_data("/posts/search", {"subreddit": sub, "limit": 1, "sort": "desc"})
+            if settled_before
+            else []
+        )
         post_rows = request_data(
             "/posts/search",
-            {"subreddit": sub, "limit": args.posts, "sort": "desc"},
+            {"subreddit": sub, "before": settled_before, "limit": args.sample_pool, "sort": "desc"},
         )
-        items.append(format_subreddit_peek(sub, meta_rows, post_rows))
+        items.append(
+            format_subreddit_peek(
+                sub,
+                meta_rows,
+                post_rows,
+                latest_rows=latest_rows,
+                keywords=keywords,
+                max_posts=args.posts,
+            )
+        )
     return {"subreddits": items}
 
 
@@ -338,16 +439,20 @@ def build_parser():
     expand.add_argument("--prefix", action="append", default=[], help="按社区名称前缀补充搜索（可重复传入）")
     expand.add_argument("--after", help="只统计该日期之后的作者活跃足迹（YYYY-MM-DD，默认近半年）")
     expand.add_argument("--all-time", action="store_true", help="统计全历史作者活跃足迹")
-    expand.add_argument("--seed-posts", type=int, default=25, help="每个种子社区抽样的近期帖子数")
-    expand.add_argument("--authors-per-seed", type=int, default=12, help="每个种子社区最多提取的独立作者数")
+    expand.add_argument("--settle-days", type=int, default=3, help="跳过最近几天的未沉淀新帖以排除秒删与零互动帖")
+    expand.add_argument("--seed-posts", type=int, default=50, help="每个种子社区抽样的近期帖子与评论数（1-100）")
+    expand.add_argument("--authors-per-seed", type=int, default=12, help="每个种子社区最多提取的独立活跃作者数")
     expand.add_argument("--prefix-limit", type=int, default=15, help="每个前缀最多返回的社区数")
     expand.add_argument("--min-authors", type=int, default=None, help="至少多少位目标作者共同活跃才保留")
     expand.add_argument("--limit", type=int, default=20, help="最多返回的候选社区数")
     expand.add_argument("--out", help="输出 JSON 文件路径（省略则直接打印）")
 
-    peek = subparsers.add_parser("peek", help="快速查看候选社区简介、侧边栏关联社区、订阅规模与近期真帖")
+    peek = subparsers.add_parser("peek", help="快速查看候选社区简介、侧边栏关联社区、订阅规模与高互动代表帖")
     peek.add_argument("--subreddit", action="append", required=True, help="候选社区名称（可重复传入）")
-    peek.add_argument("--posts", type=int, default=5, help="每个社区读取的最新帖子数")
+    peek.add_argument("--keyword", action="append", default=[], help="本地筛选帖子标题与正文的关键词（可重复传入）")
+    peek.add_argument("--posts", type=int, default=5, help="每个社区返回的高互动代表帖条数")
+    peek.add_argument("--sample-pool", type=int, default=60, help="每个社区按时间索引抽样的近期帖子池大小（1-100）")
+    peek.add_argument("--settle-days", type=int, default=3, help="往前留出几天沉淀期以统计真实评论互动（设为 0 则看最新帖）")
     peek.add_argument("--out", help="输出 JSON 文件路径（省略则直接打印）")
     return parser
 

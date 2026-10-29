@@ -4,6 +4,7 @@ from pathlib import Path
 
 
 LIBRARY_DIR = Path(__file__).resolve().parent.parent / "library"
+MAX_SHOW_CARDS = 6
 
 LIBRARY_FILES = {
     "psychology": ("抓心心理机制库", "psychology_hooks.json"),
@@ -39,20 +40,20 @@ def cmd_catalog(args: argparse.Namespace) -> None:
 
     for key in target_keys:
         title, _ = LIBRARY_FILES[key]
-        cards = libraries[key]
-        print(f"=== {title} ===")
-        current_dimension = None
-        for card in cards:
-            dim = card["dimension_name"]
-            if dim != current_dimension:
-                current_dimension = dim
-                print(f"\n【{current_dimension}】")
-            print(f"  - {card['id']} | {card['name']}")
-            print(f"    适用场景: {card['when_to_use']}")
-        print()
+        print(f"[{title}]")
+        for card in libraries[key]:
+            short_name = card["name"].split("（")[0]
+            wtu = card["when_to_use"].rstrip("。").removesuffix("时调用")
+            print(f"{card['id']}: {short_name}｜{wtu}")
 
 
 def cmd_show(args: argparse.Namespace) -> None:
+    if len(args.card_ids) > MAX_SHOW_CARDS:
+        raise ValueError(
+            f"单次最多展开 {MAX_SHOW_CARDS} 张卡片（当前传入 {len(args.card_ids)} 张）。"
+            "每个方向只需精选 1~3 张最契合的核心卡，避免套用过多规则磨平创意。"
+        )
+
     libraries = load_libraries()
     index = build_card_index(libraries)
 
@@ -69,15 +70,12 @@ def cmd_show(args: argparse.Namespace) -> None:
 
     for card in selected_cards:
         print(f"## [{card['id']}] {card['name']}")
-        print(f"- **所属维度**: {card['dimension_name']}")
-        print(f"- **理论出处**: {card['source']}")
-        print(f"- **一句话摘要**: {card['summary']}")
-        print(f"- **何时调用 (when_to_use)**: {card['when_to_use']}")
-        print(f"- **底层原理 (principle)**: {card['principle']}")
-        print(f"- **画面用法 (visual_usage)**: {card['visual_usage']}")
-        print(f"- **文案用法 (copy_usage)**: {card['copy_usage']}")
-        print(f"- **误用注意点 (pitfalls)**: {card['pitfalls']}")
-        print(f"- **推荐搭配卡片 (pairs_with)**: {', '.join(card['pairs_with'])}")
+        print(f"- 所属维度: {card['dimension_name']} | 出处: {card['source']}")
+        print(f"- 何时调用: {card['when_to_use']}")
+        print(f"- 底层原理: {card['principle']}")
+        print(f"- 画面启发: {card['visual_usage']}")
+        print(f"- 文案启发: {card['copy_usage']}")
+        print(f"- 注意事项: {card['pitfalls']}")
         print()
 
 
@@ -85,7 +83,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Reddit 广告创意理论卡片检索工具")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    p_catalog = subparsers.add_parser("catalog", help="列出理论与技巧卡片的紧凑目录")
+    p_catalog = subparsers.add_parser("catalog", help="单屏列出全部理论卡片的名称与适用场景")
     p_catalog.add_argument(
         "--library",
         choices=["all", "psychology", "visual", "headline", "persuasion"],
@@ -94,8 +92,8 @@ def main() -> None:
     )
     p_catalog.set_defaults(func=cmd_catalog)
 
-    p_show = subparsers.add_parser("show", help="按卡片 ID 展开完整原理、画面用法、文案用法与注意点")
-    p_show.add_argument("card_ids", nargs="+", help="要查看的卡片 ID")
+    p_show = subparsers.add_parser("show", help="按卡片 ID 展开精选卡片详情（单次最多 6 张）")
+    p_show.add_argument("card_ids", nargs="+", help="要查看的卡片 ID（1~6 个）")
     p_show.add_argument("--json", action="store_true", help="以 JSON 格式输出卡片详情")
     p_show.set_defaults(func=cmd_show)
 
